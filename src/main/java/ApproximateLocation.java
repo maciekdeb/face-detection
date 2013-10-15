@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
+import static java.lang.Math.*;
+
 /**
  * Created with IntelliJ IDEA.
  * User: maciek
@@ -74,6 +76,11 @@ public class ApproximateLocation {
 
             ImageIO.write(directionalImage, "JPG", new File("directional-image.jpg"));
 
+            double[][] candidatesForElipse = prepareCandidatesForElipseCenter(bufferedImage, vectors);
+            for (double[] candidate : candidatesForElipse) {
+                System.out.println(Arrays.toString(candidate));
+            }
+
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -89,47 +96,84 @@ public class ApproximateLocation {
      * for pixel in T:
      * A[x,y]=A[x,y] + modulus*weightT([x,y])
      */
-    public static Double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, List<List<Vector>> vectors) {
-        Double[][] candidatesMap = new Double[bufferedImage.getHeight()][bufferedImage.getWidth()];
+    public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, List<List<Vector>> vectors) {
+
+        /**
+         * Maio, Maltoni: A
+         */
+        double[][] candidatesMap = new double[bufferedImage.getHeight()][bufferedImage.getWidth()];
 
         Elipse referenceElipse = new Elipse(40, 50, 1.25, 0.75);
 
         for (List<Vector> vectorList : vectors) {
             for (Vector vector : vectorList) {
-                List<Point> currentTemplate = currentTemplate(vector.getOrigin(), vector.getDirection(), referenceElipse);
 
+                double beta = atan(-referenceElipse.getSemiAxeHeight() / (referenceElipse.getSemiAxeWidth() * tan(vector.getDirection())));
+                //TODO theta
+                double theta = 1.0;
 
+                List<Point> currentTemplate = currentTemplate(vector.getOrigin(), referenceElipse, beta, theta);
+
+                for (Point point : currentTemplate) {
+                    int x = point.getX();
+                    int y = point.getY();
+
+                    //todo modulus??
+                    candidatesMap[x][y] += vector.getTangent()[1] * weightT(point, vector.getOrigin(), theta, beta);
+                }
             }
         }
 
         return candidatesMap;
     }
 
-    public static List<Point> currentTemplate(Point origin, double direction, Elipse referenceElipse) {
+    public static List<Point> currentTemplate(Point origin, Elipse referenceElipse, double theta, double beta) {
         List<Point> currentTemplate = new ArrayList<Point>();
 
         double pr = referenceElipse.getReductionCoefficient();
         double pe = referenceElipse.getReductionCoefficient();
         double a = referenceElipse.getSemiAxeWidth();
         double b = referenceElipse.getSemiAxeHeight();
+        double x0 = origin.getX();
+        double y0 = origin.getY();
 
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
+        //TODO xy
+        for (int x = (int) (x0 - a - 1); x < (int) (0 + a + 1); x++) {
+            for (int y = (int) (y0 - b - 1); y < (int) (y0 + b + 1); y++) {
 
-                double validityExpression = (Math.pow((x - origin.getX()) / a, 2) + Math.pow((y - origin.getY()) / b, 2));
-                if ((pr * pr) <= validityExpression && validityExpression <= pe * pe) {
-                    if (true) {
+                double validityExpression = (Math.pow((x - x0) / a, 2) + Math.pow((y - y0) / b, 2));
+                if ((pr * pr) <= validityExpression && validityExpression <= (pe * pe)) {
+
+                    if (angleFromDirections(atan((y - y0) / (x - x0)), beta) <= (theta / 2.0)) {
+                        currentTemplate.add(new Point(x, y));
                     }
                 }
             }
         }
 
-
         return currentTemplate;
     }
 
-    public static double smallerAngleFromDirections(double alfa, double beta) {
-        return 0;
+    /**
+     * @return smaller angle from directions alfa beta
+     */
+    public static double angleFromDirections(double alfa, double beta) {
+        double delta = abs(alfa - beta);
+        if (delta > PI) {
+            return 2 * PI - delta;
+        } else {
+            return delta;
+        }
+    }
+
+    public static double weightT(Point point, Point origin, double theta, double beta) {
+        int x0 = origin.getX();
+        int y0 = origin.getY();
+        int x = point.getX();
+        int y = point.getY();
+
+        double angle = angleFromDirections(atan((y - y0) / (x - x0)), beta);
+        return 1.0 - 2.0 * angle / theta;
     }
 
     public static Double[] computeABC(BufferedImage bufferedImage, int x_start, int y_start, int alfa) {
@@ -171,7 +215,7 @@ public class ApproximateLocation {
 
     public static double getDirection(Double[] t) {
         if (t[0] != 0) {
-            return Math.atan(t[1] / t[0]);
+            return (Math.atan(t[1] / t[0]) >= 0 ? Math.atan(t[1] / t[0]) : 2 * Math.PI + Math.atan(t[1] / t[0]));
         } else {
             return Math.PI / 2.0;
         }
