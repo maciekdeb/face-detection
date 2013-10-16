@@ -83,7 +83,7 @@ public class Utils {
         return result.subList(0, number);
     }
 
-    public static void drawAngles(BufferedImage directionalImage, double radians, int x_start, int y_start, int alfa) {
+    public static void drawVector(BufferedImage directionalImage, double radians, int x_start, int y_start, int alfa) {
         int distance = alfa / 2;
         int x = distance + 1 + x_start;
         int y = distance + 1 + y_start;

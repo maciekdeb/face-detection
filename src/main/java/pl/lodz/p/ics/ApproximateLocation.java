@@ -50,7 +50,7 @@ public class ApproximateLocation {
                     vectors.get(index).add(new pl.lodz.p.ics.model.Vector(new pl.lodz.p.ics.model.Point(i, j), tangent, direction));
                     index++;
 
-                    Utils.drawAngles(directionalImage, direction, i, j, ALFA);
+                    Utils.drawVector(directionalImage, direction, i, j, ALFA);
                 }
             }
 
