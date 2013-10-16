@@ -17,39 +17,23 @@ import static java.lang.Math.*;
  */
 public class ApproximateLocation {
 
+    public static int ALFA = 10;
+
     public static void main(String[] args) {
         try {
 
             URL url = ApproximateLocation.class.getResource("/image.jpg");
-            BufferedImage bufferedImage = ImageIO.read(url);
+            BufferedImage image = ImageIO.read(url);
 
-            int width = bufferedImage.getWidth();
-            int height = bufferedImage.getHeight();
-
-            BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-
-            int ALFA = 10;
+            int width = image.getWidth();
+            int height = image.getHeight();
 
             BufferedImage directionalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-
-            for (int y = 0; y < width; y++) {
-                for (int x = 0; x < height; x++) {
-                    directionalImage.setRGB(y, x, 0xFFFFFFFF);
-                }
+            int[][] rgb = new int[height][width];
+            for (int i = 0; i < rgb.length; i++) {
+                Arrays.fill(rgb[i], 0xFFFFFFFF);
             }
-
-           /* angles = [[]]
-            # n = 0
-            for i in range(1, width - ALFA, ALFA):
-            angles.append([])
-            for j in range(1, height - ALFA, ALFA):
-            abc = computeABC(i, j, ALFA)
-            t = getTangent(abc)
-            fi = getDirection(t)
-            draw.drawAngles(fi, directionalImage, i, j, ALFA)
-            # angle = fi * 180 / math.pi
-            # angles[n].append(angle)
-            # n += 1*/
+            fillImage(directionalImage, rgb);
 
             List<List<Vector>> vectors = new ArrayList<List<Vector>>();
             for (int j = 1; j < height - ALFA; j += ALFA) {
@@ -59,7 +43,7 @@ public class ApproximateLocation {
             for (int i = 1; i < width - ALFA; i += ALFA) {
                 int index = 0;
                 for (int j = 1; j < height - ALFA; j += ALFA) {
-                    Double[] abc = computeABC(bufferedImage, i, j, ALFA);
+                    Double[] abc = computeABC(image, i, j, ALFA);
                     Double[] tangent = getTangent(abc);
                     double direction = getDirection(tangent);
 
@@ -70,19 +54,86 @@ public class ApproximateLocation {
                 }
             }
 
-            for (List vector : vectors) {
-                System.out.println(vector.toString());
-            }
-
             ImageIO.write(directionalImage, "JPG", new File("directional-image.jpg"));
 
-            double[][] candidatesForElipse = prepareCandidatesForElipseCenter(bufferedImage, vectors);
-            for (double[] candidate : candidatesForElipse) {
-                System.out.println(Arrays.toString(candidate));
+            Elipse referenceElipse = new Elipse(50, 60, 1.25, 0.75);
+            double[][] candidatesForElipse = prepareCandidatesForElipseCenter(image, referenceElipse, vectors);
+            int[][] centers = convertRGB(candidatesForElipse);
+            BufferedImage centerImage = new BufferedImage(centers[0].length, centers.length, BufferedImage.TYPE_3BYTE_BGR);
+            fillImage(centerImage, centers);
+
+            List<Point> maxCenters = findMaxValues(centers, 6);
+
+            for (Point point : maxCenters) {
+                Graphics2D graphics2D = (Graphics2D) centerImage.getGraphics();
+                graphics2D.setColor(Color.RED);
+                graphics2D.drawOval(point.getX(), point.getY(), (int) referenceElipse.getSemiAxeWidth() * 2, (int) referenceElipse.getSemiAxeHeight() * 2);
             }
+
+            ImageIO.write(centerImage, "JPG", new File("centers-image.jpg"));
 
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public static List<Point> findMaxValues(int[][] rgb, int number) {
+        List<Point> result = new ArrayList<Point>();
+        int width = rgb[0].length;
+        int height = rgb.length;
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Point point = new Point(x, y);
+                point.setColor(rgb[y][x]);
+                result.add(point);
+            }
+        }
+
+        Collections.sort(result);
+
+        return result.subList(0, number);
+    }
+
+    public static int[][] convertRGB(double[][] input) {
+        int width = input[0].length;
+        int height = input.length;
+        int[][] rgb = new int[height][width];
+
+        double max = input[0][0];
+        double min = input[0][0];
+
+        for (int i = 0; i < input.length; i++) {
+            for (int j = 0; j < input[i].length; j++) {
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+                if (input[i][j] > max) {
+                    max = input[i][j];
+                }
+                if (input[i][j] < min) {
+                    min = input[i][j];
+                }
+            }
+        }
+        double unit = 255.0 / (max - min);
+
+        for (int i = 0; i < rgb.length; i++) {
+            for (int j = 0; j < rgb[i].length; j++) {
+                rgb[i][j] = (int) ((input[i][j] + abs(min)) * unit);
+                rgb[i][j] = (rgb[i][j] << 8) | rgb[i][j];
+                rgb[i][j] = (rgb[i][j] << 8) | rgb[i][j];
+            }
+        }
+
+        return rgb;
+    }
+
+    public static void fillImage(BufferedImage bufferedImage, int[][] rgb) {
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                bufferedImage.setRGB(x, y, rgb[y][x]);
+            }
         }
     }
 
@@ -96,30 +147,31 @@ public class ApproximateLocation {
      * for pixel in T:
      * A[x,y]=A[x,y] + modulus*weightT([x,y])
      */
-    public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, List<List<Vector>> vectors) {
+    public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, Elipse referenceElipse, List<List<Vector>> vectors) {
 
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
         /**
          * Maio, Maltoni: A
          */
-        double[][] candidatesMap = new double[bufferedImage.getHeight()][bufferedImage.getWidth()];
+        double[][] candidatesMap = new double[height][width];
 
-        Elipse referenceElipse = new Elipse(40, 50, 1.25, 0.75);
 
         for (List<Vector> vectorList : vectors) {
             for (Vector vector : vectorList) {
 
                 double beta = atan(-referenceElipse.getSemiAxeHeight() / (referenceElipse.getSemiAxeWidth() * tan(vector.getDirection())));
                 //TODO theta
-                double theta = 1.0;
+                double theta = 0.8;
 
-                List<Point> currentTemplate = currentTemplate(vector.getOrigin(), referenceElipse, beta, theta);
+                List<Point> currentTemplate = currentTemplate(bufferedImage, vector.getOrigin(), referenceElipse, beta, theta);
 
                 for (Point point : currentTemplate) {
                     int x = point.getX();
                     int y = point.getY();
 
                     //todo modulus??
-                    candidatesMap[x][y] += vector.getTangent()[1] * weightT(point, vector.getOrigin(), theta, beta);
+                    candidatesMap[y][x] += abs(vector.getTangent()[1]) * weightT(point, vector.getOrigin(), theta, beta);
                 }
             }
         }
@@ -127,7 +179,7 @@ public class ApproximateLocation {
         return candidatesMap;
     }
 
-    public static List<Point> currentTemplate(Point origin, Elipse referenceElipse, double theta, double beta) {
+    public static List<Point> currentTemplate(BufferedImage bufferedImage, Point origin, Elipse referenceElipse, double theta, double beta) {
         List<Point> currentTemplate = new ArrayList<Point>();
 
         double pr = referenceElipse.getReductionCoefficient();
@@ -137,8 +189,12 @@ public class ApproximateLocation {
         double x0 = origin.getX();
         double y0 = origin.getY();
 
+        if (x0 - a - 1 < 1 || x0 + a + 1 > bufferedImage.getWidth() || y0 - b - 1 < 1 || y0 + b + 1 > bufferedImage.getHeight()) {
+            return Collections.emptyList();
+        }
+
         //TODO xy
-        for (int x = (int) (x0 - a - 1); x < (int) (0 + a + 1); x++) {
+        for (int x = (int) (x0 - a - 1); x < (int) (x0 + a + 1); x++) {
             for (int y = (int) (y0 - b - 1); y < (int) (y0 + b + 1); y++) {
 
                 double validityExpression = (Math.pow((x - x0) / a, 2) + Math.pow((y - y0) / b, 2));
@@ -171,6 +227,10 @@ public class ApproximateLocation {
         int y0 = origin.getY();
         int x = point.getX();
         int y = point.getY();
+
+        if (x0 == x || y0 == y) {
+            return 0;
+        }
 
         double angle = angleFromDirections(atan((y - y0) / (x - x0)), beta);
         return 1.0 - 2.0 * angle / theta;
