@@ -1,3 +1,5 @@
+package pl.lodz.p.ics.model;
+
 /**
  * User: maciek
  * Date: 15.10.13

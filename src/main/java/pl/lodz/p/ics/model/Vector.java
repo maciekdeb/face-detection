@@ -1,4 +1,4 @@
-import java.util.Arrays;
+package pl.lodz.p.ics.model;
 
 /**
  * User: maciek
