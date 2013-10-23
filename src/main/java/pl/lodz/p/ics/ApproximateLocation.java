@@ -19,12 +19,37 @@ import java.util.List;
  */
 public class ApproximateLocation {
 
-    public static int ALFA = 10;
+    public static int ALFA;
+    public static int CENTERS_NUMBER;
+    public static int ELIPSE_WIDTH;
+    public static int ELIPSE_HEIGHT;
+    public static double ELIPSE_HEIGHT_EXPANSION_COEFFICIENT;
+    public static double ELIPSE_HEIGHT_REDUCTION_COEFFICIENT;
+
+    static {
+        Properties properties = new Properties();
+
+        try {
+            properties.load(ApproximateLocation.class.getClassLoader().getResourceAsStream("config.properties"));
+
+            ALFA = Integer.parseInt(properties.getProperty("ALFA"));
+            CENTERS_NUMBER = Integer.parseInt(properties.getProperty("CENTERS_NUMBER"));
+            ELIPSE_WIDTH = Integer.parseInt(properties.getProperty("ELIPSE_WIDTH"));
+            ELIPSE_HEIGHT = Integer.parseInt(properties.getProperty("ELIPSE_HEIGHT"));
+            ELIPSE_HEIGHT_EXPANSION_COEFFICIENT = Double.parseDouble(properties.getProperty("ELIPSE_HEIGHT_EXPANSION_COEFFICIENT"));
+            ELIPSE_HEIGHT_REDUCTION_COEFFICIENT = Double.parseDouble(properties.getProperty("ELIPSE_HEIGHT_REDUCTION_COEFFICIENT"));
+
+            properties.list(System.out);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         try {
 
-            URL url = ApproximateLocation.class.getResource("/face.jpg");
+            URL url = ApproximateLocation.class.getResource("/image-2.jpg");
             BufferedImage image = ImageIO.read(url);
 
             int width = image.getWidth();
@@ -56,13 +81,13 @@ public class ApproximateLocation {
 
             ImageIO.write(directionalImage, "JPG", new File("directional-image.jpg"));
 
-            Elipse referenceElipse = new Elipse(70, 80, 1.25, 0.75);
+            Elipse referenceElipse = new Elipse(ELIPSE_WIDTH, ELIPSE_HEIGHT, ELIPSE_HEIGHT_EXPANSION_COEFFICIENT, ELIPSE_HEIGHT_REDUCTION_COEFFICIENT);
             double[][] candidatesForElipse = HoughTransform.prepareCandidatesForElipseCenter(image, referenceElipse, vectors);
             int[][] centers = Utils.convertRGB(candidatesForElipse);
             BufferedImage centerImage = new BufferedImage(centers[0].length, centers.length, BufferedImage.TYPE_3BYTE_BGR);
             Utils.fillImage(centerImage, centers);
 
-            List<pl.lodz.p.ics.model.Point> maxCenters = Utils.findMaxValues(centers, 1);
+            List<pl.lodz.p.ics.model.Point> maxCenters = Utils.findMaxValues(centers, CENTERS_NUMBER);
 
             for (pl.lodz.p.ics.model.Point point : maxCenters) {
                 Graphics2D graphics2D = (Graphics2D) centerImage.getGraphics();
