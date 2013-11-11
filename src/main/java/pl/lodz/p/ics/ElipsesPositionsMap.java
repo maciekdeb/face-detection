@@ -36,7 +36,6 @@ public class ElipsesPositionsMap {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Point point = new Point(x, y);
-                System.out.println(votesMap[y][x]);
                 point.setColor((int) votesMap[y][x]);
                 result.add(point);
             }
