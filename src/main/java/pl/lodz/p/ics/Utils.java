@@ -2,6 +2,7 @@ package pl.lodz.p.ics;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,25 +63,6 @@ public class Utils {
         }
 
         return rgb;
-    }
-
-    public static List<pl.lodz.p.ics.model.Point> findMaxValues(int[][] rgb, int number) {
-        List<pl.lodz.p.ics.model.Point> result = new ArrayList<pl.lodz.p.ics.model.Point>();
-
-        int width = rgb[0].length;
-        int height = rgb.length;
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                pl.lodz.p.ics.model.Point point = new pl.lodz.p.ics.model.Point(x, y);
-                point.setColor(rgb[y][x]);
-                result.add(point);
-            }
-        }
-
-        Collections.sort(result);
-
-        return result.subList(0, number);
     }
 
     public static void drawVector(BufferedImage directionalImage, double radians, int x_start, int y_start, int alfa) {

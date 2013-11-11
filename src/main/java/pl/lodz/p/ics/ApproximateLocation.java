@@ -1,6 +1,8 @@
 package pl.lodz.p.ics;
 
 import pl.lodz.p.ics.model.*;
+import pl.lodz.p.ics.model.Point;
+import pl.lodz.p.ics.model.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,95 +13,56 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
+import static pl.lodz.p.ics.model.ConfigurationValues.*;
+
 /**
- * Created with IntelliJ IDEA.
  * User: maciek
  * Date: 08.10.13
  * Time: 18:13
  */
 public class ApproximateLocation {
 
-    public static int ALFA;
-    public static int CENTERS_NUMBER;
-    public static int ELIPSE_WIDTH;
-    public static int ELIPSE_HEIGHT;
-    public static double ELIPSE_HEIGHT_EXPANSION_COEFFICIENT;
-    public static double ELIPSE_HEIGHT_REDUCTION_COEFFICIENT;
-
-    static {
-        Properties properties = new Properties();
-
+    public static void main(String[] args) {
         try {
-            properties.load(ApproximateLocation.class.getClassLoader().getResourceAsStream("config.properties"));
+            BufferedImage image = ImageIO.read(getURLS().get(0));
 
-            ALFA = Integer.parseInt(properties.getProperty("ALFA"));
-            CENTERS_NUMBER = Integer.parseInt(properties.getProperty("CENTERS_NUMBER"));
-            ELIPSE_WIDTH = Integer.parseInt(properties.getProperty("ELIPSE_WIDTH"));
-            ELIPSE_HEIGHT = Integer.parseInt(properties.getProperty("ELIPSE_HEIGHT"));
-            ELIPSE_HEIGHT_EXPANSION_COEFFICIENT = Double.parseDouble(properties.getProperty("ELIPSE_HEIGHT_EXPANSION_COEFFICIENT"));
-            ELIPSE_HEIGHT_REDUCTION_COEFFICIENT = Double.parseDouble(properties.getProperty("ELIPSE_HEIGHT_REDUCTION_COEFFICIENT"));
+            DirectionalMap directionalMap = new DirectionalMap(image, ALFA).build();
+            ImageIO.write(directionalMap.getDirectionalImage(), "JPG", new File(OUTPUT_DIRECTIONAL_IMAGE));
 
-            properties.list(System.out);
+            Elipse referenceElipse = getReferenceElipse();
+
+            ElipsesPositionsMap approximateElipsesPositions = new ElipsesPositionsMap(image, directionalMap, referenceElipse);
+            double[][] votesMap = approximateElipsesPositions.getVotesMap();
+
+            drawVotes(votesMap);
+
+            List<Point> elipsesCenters = approximateElipsesPositions.findCenters(CENTERS_NUMBER);
+            drawElipsesCenters(image, referenceElipse, elipsesCenters);
+//            drawElipsesCenters(directionalMap.getDirectionalImage(), referenceElipse, elipsesCenters);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        try {
+    public static void drawVotes(double[][] votes) throws IOException {
+        int[][] votesRGB = Utils.convertRGB(votes);
+        BufferedImage centerImage = new BufferedImage(votesRGB[0].length, votesRGB.length, BufferedImage.TYPE_3BYTE_BGR);
+        Utils.fillImage(centerImage, votesRGB);
+        ImageIO.write(centerImage, "JPG", new File(OUTPUT_VOTES_IMAGE));
+    }
 
-            URL url = ApproximateLocation.class.getResource("/image-2.jpg");
-            BufferedImage image = ImageIO.read(url);
+    public static void drawElipsesCenters(BufferedImage image, Elipse elipse, List<Point> elipsesCenters) throws IOException {
 
-            int width = image.getWidth();
-            int height = image.getHeight();
+        for (Point point : elipsesCenters) {
 
-            BufferedImage directionalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-            int[][] rgb = new int[height][width];
-            Utils.fillArray(rgb, 0xFFFFFFFF);
-            Utils.fillImage(directionalImage, rgb);
+            Graphics2D graphics2D = (Graphics2D) image.getGraphics();
+            graphics2D.setColor(Color.RED);
+            graphics2D.drawOval(point.getX(), point.getY(), (int) elipse.getSemiAxeWidth() * 2, (int) elipse.getSemiAxeHeight() * 2);
 
-            List<List<pl.lodz.p.ics.model.Vector>> vectors = new ArrayList<List<pl.lodz.p.ics.model.Vector>>();
-            for (int j = 1; j < height - ALFA; j += ALFA) {
-                vectors.add(new ArrayList<pl.lodz.p.ics.model.Vector>());
-            }
-
-            for (int i = 1; i < width - ALFA; i += ALFA) {
-                int index = 0;
-                for (int j = 1; j < height - ALFA; j += ALFA) {
-                    Double[] abc = DirectionalMap.computeABC(image, i, j, ALFA);
-                    Double[] tangent = DirectionalMap.getTangent(abc);
-                    double direction = DirectionalMap.getDirection(tangent);
-
-                    vectors.get(index).add(new pl.lodz.p.ics.model.Vector(new pl.lodz.p.ics.model.Point(i, j), tangent, direction));
-                    index++;
-
-                    Utils.drawVector(directionalImage, direction, i, j, ALFA);
-                }
-            }
-
-            ImageIO.write(directionalImage, "JPG", new File("directional-image.jpg"));
-
-            Elipse referenceElipse = new Elipse(ELIPSE_WIDTH, ELIPSE_HEIGHT, ELIPSE_HEIGHT_EXPANSION_COEFFICIENT, ELIPSE_HEIGHT_REDUCTION_COEFFICIENT);
-            double[][] candidatesForElipse = HoughTransform.prepareCandidatesForElipseCenter(image, referenceElipse, vectors);
-            int[][] centers = Utils.convertRGB(candidatesForElipse);
-            BufferedImage centerImage = new BufferedImage(centers[0].length, centers.length, BufferedImage.TYPE_3BYTE_BGR);
-            Utils.fillImage(centerImage, centers);
-
-            List<pl.lodz.p.ics.model.Point> maxCenters = Utils.findMaxValues(centers, CENTERS_NUMBER);
-
-            for (pl.lodz.p.ics.model.Point point : maxCenters) {
-                Graphics2D graphics2D = (Graphics2D) centerImage.getGraphics();
-                graphics2D.setColor(Color.RED);
-                graphics2D.drawOval(point.getX(), point.getY(), (int) referenceElipse.getSemiAxeWidth() * 2, (int) referenceElipse.getSemiAxeHeight() * 2);
-            }
-
-            ImageIO.write(centerImage, "JPG", new File("centers-image.jpg"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        ImageIO.write(image, "JPG", new File(OUTPUT_ELIPSES_IMAGE));
     }
 
 }
