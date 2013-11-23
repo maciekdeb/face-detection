@@ -7,8 +7,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static pl.lodz.p.ics.model.ConfigurationValues.ALFA;
-
 /**
  * User: maciek
  * Date: 16.10.13

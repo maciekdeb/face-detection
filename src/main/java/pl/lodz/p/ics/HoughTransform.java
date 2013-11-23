@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static java.lang.Math.*;
 import static java.lang.Math.PI;
@@ -20,15 +21,17 @@ import static java.lang.Math.atan;
  */
 public class HoughTransform {
 
+//    Logger logger = Logger.getLogger("HoughTransform");
+
     /**
      * reset A
      * for v in vectors:
-     * x0,y0 = origin(v)
-     * direction = direction(v)
-     * modulus = modulus(d)
-     * T = current_template([x0,y0], direction)
-     * for pixel in T:
-     * A[x,y]=A[x,y] + modulus*weightT([x,y])
+     *     x0,y0 = origin(v)
+     *     direction = direction(v)
+     *     modulus = modulus(d)
+     *     T = current_template([x0,y0], direction)
+     *         for pixel in T:
+     *         A[x,y]=A[x,y] + modulus*weightT([x,y])
      */
     public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, Elipse referenceElipse, List<List<Vector>> vectors) {
 
@@ -38,7 +41,6 @@ public class HoughTransform {
          * Maio, Maltoni: A
          */
         double[][] candidatesMap = new double[height][width];
-
 
         for (List<Vector> vectorList : vectors) {
             for (Vector vector : vectorList) {
@@ -76,6 +78,8 @@ public class HoughTransform {
             return Collections.emptyList();
         }
 
+        System.out.print("\nOrigin: " + origin.getX() + " " + origin.getY());
+
         //TODO xy
         for (int x = (int) (x0 - a - 1); x < (int) (x0 + a + 1); x++) {
             for (int y = (int) (y0 - b - 1); y < (int) (y0 + b + 1); y++) {
@@ -84,6 +88,7 @@ public class HoughTransform {
                 if ((pr * pr) <= validityExpression && validityExpression <= (pe * pe)) {
 
                     if (angleFromDirections(atan((y - y0) / (x - x0)), beta) <= (theta / 2.0)) {
+                        System.out.print(" [" + x + ", " + y + "]");
                         currentTemplate.add(new Point(x, y));
                     }
                 }

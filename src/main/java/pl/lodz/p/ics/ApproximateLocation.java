@@ -30,7 +30,6 @@ public class ApproximateLocation {
             ImageIO.write(directionalMap.getDirectionalImage(), "JPG", new File(OUTPUT_DIRECTIONAL_IMAGE));
 
             Elipse referenceElipse = getReferenceElipse();
-
             ElipsesPositionsMap approximateElipsesPositions = new ElipsesPositionsMap(image, directionalMap, referenceElipse);
             double[][] votesMap = approximateElipsesPositions.getVotesMap();
 
