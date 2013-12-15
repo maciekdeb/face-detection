@@ -5,7 +5,7 @@ package pl.lodz.p.ics.model;
  * Date: 15.10.13
  * Time: 13:23
  */
-public class Elipse {
+public class Ellipse {
 
     /**
      * Maio, Maltoni: a
@@ -31,7 +31,7 @@ public class Elipse {
     private double maxSemiAxeWidth;
     private double minSemiAxeWidth;
 
-    public Elipse(double semiAxeWidth, double semiAxeHeight, double expansionCoefficient, double reductionCoefficient) {
+    public Ellipse(double semiAxeWidth, double semiAxeHeight, double expansionCoefficient, double reductionCoefficient) {
         this.semiAxeWidth = semiAxeWidth;
         this.semiAxeHeight = semiAxeHeight;
         this.expansionCoefficient = expansionCoefficient;

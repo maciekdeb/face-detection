@@ -2,15 +2,12 @@ package pl.lodz.p.ics;
 
 import pl.lodz.p.ics.model.*;
 import pl.lodz.p.ics.model.Point;
-import pl.lodz.p.ics.model.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.*;
 import java.util.List;
 
 import static pl.lodz.p.ics.model.ConfigurationValues.*;
@@ -29,15 +26,15 @@ public class ApproximateLocation {
             DirectionalMap directionalMap = new DirectionalMap(image, ALFA).build();
             ImageIO.write(directionalMap.getDirectionalImage(), "JPG", new File(OUTPUT_DIRECTIONAL_IMAGE));
 
-            Elipse referenceElipse = getReferenceElipse();
-            ElipsesPositionsMap approximateElipsesPositions = new ElipsesPositionsMap(image, directionalMap, referenceElipse);
+            Ellipse referenceEllipse = getReferenceElipse();
+            EllipsesPositionsMap approximateElipsesPositions = new EllipsesPositionsMap(image, directionalMap, referenceEllipse);
             double[][] votesMap = approximateElipsesPositions.getVotesMap();
 
             drawVotes(votesMap);
 
             List<Point> elipsesCenters = approximateElipsesPositions.findCenters(CENTERS_NUMBER);
-            drawElipsesCenters(image, referenceElipse, elipsesCenters);
-//            drawElipsesCenters(directionalMap.getDirectionalImage(), referenceElipse, elipsesCenters);
+            drawElipsesCenters(image, referenceEllipse, elipsesCenters);
+//            drawElipsesCenters(directionalMap.getDirectionalImage(), referenceEllipse, elipsesCenters);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,13 +48,13 @@ public class ApproximateLocation {
         ImageIO.write(centerImage, "JPG", new File(OUTPUT_VOTES_IMAGE));
     }
 
-    public static void drawElipsesCenters(BufferedImage image, Elipse elipse, List<Point> elipsesCenters) throws IOException {
+    public static void drawElipsesCenters(BufferedImage image, Ellipse ellipse, List<Point> elipsesCenters) throws IOException {
 
         for (Point point : elipsesCenters) {
 
             Graphics2D graphics2D = (Graphics2D) image.getGraphics();
             graphics2D.setColor(Color.RED);
-            graphics2D.drawOval(point.getX(), point.getY(), (int) elipse.getSemiAxeWidth() * 2, (int) elipse.getSemiAxeHeight() * 2);
+            graphics2D.drawOval(point.getX(), point.getY(), (int) ellipse.getSemiAxeWidth() * 2, (int) ellipse.getSemiAxeHeight() * 2);
 
         }
 

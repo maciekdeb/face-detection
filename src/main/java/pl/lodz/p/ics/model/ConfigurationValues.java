@@ -6,12 +6,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * User: maciek
@@ -67,8 +64,8 @@ public class ConfigurationValues {
         return result;
     }
 
-    public static Elipse getReferenceElipse() {
-        return new Elipse(ELIPSE_WIDTH, ELIPSE_HEIGHT, ELIPSE_HEIGHT_EXPANSION_COEFFICIENT, ELIPSE_HEIGHT_REDUCTION_COEFFICIENT);
+    public static Ellipse getReferenceElipse() {
+        return new Ellipse(ELIPSE_WIDTH, ELIPSE_HEIGHT, ELIPSE_HEIGHT_EXPANSION_COEFFICIENT, ELIPSE_HEIGHT_REDUCTION_COEFFICIENT);
     }
 
 }

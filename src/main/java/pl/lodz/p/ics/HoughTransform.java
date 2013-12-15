@@ -1,6 +1,6 @@
 package pl.lodz.p.ics;
 
-import pl.lodz.p.ics.model.Elipse;
+import pl.lodz.p.ics.model.Ellipse;
 import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.Vector;
 
@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static java.lang.Math.*;
 import static java.lang.Math.PI;
@@ -33,7 +32,7 @@ public class HoughTransform {
      *         for pixel in T:
      *         A[x,y]=A[x,y] + modulus*weightT([x,y])
      */
-    public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, Elipse referenceElipse, List<List<Vector>> vectors) {
+    public static double[][] prepareCandidatesForElipseCenter(BufferedImage bufferedImage, Ellipse referenceEllipse, List<List<Vector>> vectors) {
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
@@ -45,11 +44,11 @@ public class HoughTransform {
         for (List<Vector> vectorList : vectors) {
             for (Vector vector : vectorList) {
 
-                double beta = atan(-referenceElipse.getSemiAxeHeight() / (referenceElipse.getSemiAxeWidth() * tan(vector.getDirection())));
+                double beta = atan(-referenceEllipse.getSemiAxeHeight() / (referenceEllipse.getSemiAxeWidth() * tan(vector.getDirection())));
                 //TODO theta
                 double theta = 0.8;
 
-                List<Point> currentTemplate = currentTemplate(bufferedImage, vector.getOrigin(), referenceElipse, beta, theta);
+                List<Point> currentTemplate = currentTemplate(bufferedImage, vector.getOrigin(), referenceEllipse, beta, theta);
 
                 for (Point point : currentTemplate) {
                     int x = point.getX();
@@ -64,13 +63,13 @@ public class HoughTransform {
         return candidatesMap;
     }
 
-    public static List<Point> currentTemplate(BufferedImage bufferedImage, Point origin, Elipse referenceElipse, double theta, double beta) {
+    public static List<Point> currentTemplate(BufferedImage bufferedImage, Point origin, Ellipse referenceEllipse, double theta, double beta) {
         List<Point> currentTemplate = new ArrayList<Point>();
 
-        double pr = referenceElipse.getReductionCoefficient();
-        double pe = referenceElipse.getReductionCoefficient();
-        double a = referenceElipse.getSemiAxeWidth();
-        double b = referenceElipse.getSemiAxeHeight();
+        double pr = referenceEllipse.getReductionCoefficient();
+        double pe = referenceEllipse.getReductionCoefficient();
+        double a = referenceEllipse.getSemiAxeWidth();
+        double b = referenceEllipse.getSemiAxeHeight();
         double x0 = origin.getX();
         double y0 = origin.getY();
 

@@ -1,7 +1,6 @@
-package pl.lodz.p.ics;
+package pl.lodz.p.ics.model;
 
-import pl.lodz.p.ics.model.Elipse;
-import pl.lodz.p.ics.model.Point;
+import pl.lodz.p.ics.HoughTransform;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -13,13 +12,13 @@ import java.util.List;
  * Date: 11.11.13
  * Time: 22:01
  */
-public class ElipsesPositionsMap {
+public class EllipsesPositionsMap {
 
     private double[][] votesMap;
 
-    public ElipsesPositionsMap(BufferedImage image, DirectionalMap directionalMap, Elipse referenceElipse) {
+    public EllipsesPositionsMap(BufferedImage image, DirectionalMap directionalMap, Ellipse referenceEllipse) {
 
-        votesMap = HoughTransform.prepareCandidatesForElipseCenter(image, referenceElipse, directionalMap.getVectors());
+        votesMap = HoughTransform.prepareCandidatesForElipseCenter(image, referenceEllipse, directionalMap.getVectors());
 
     }
 
