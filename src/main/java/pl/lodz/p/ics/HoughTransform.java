@@ -1,6 +1,6 @@
 package pl.lodz.p.ics;
 
-import pl.lodz.p.ics.model.Ellipse;
+import pl.lodz.p.ics.model.transform.Ellipse;
 import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.Vector;
 

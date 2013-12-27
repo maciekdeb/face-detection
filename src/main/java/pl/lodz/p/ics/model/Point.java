@@ -61,4 +61,9 @@ public class Point implements Comparable {
 
         return a > b ? +1 : a < b ? -1 : 0;
     }
+
+    public Point add(Point other) {
+        return new Point(this.getX() + other.getX(), this.getY() + other.getY());
+    }
+
 }

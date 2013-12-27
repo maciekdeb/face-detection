@@ -1,7 +1,9 @@
 package pl.lodz.p.ics;
 
-import pl.lodz.p.ics.model.*;
 import pl.lodz.p.ics.model.Point;
+import pl.lodz.p.ics.model.transform.DirectionalMap;
+import pl.lodz.p.ics.model.transform.Ellipse;
+import pl.lodz.p.ics.model.transform.EllipsesPositionsMap;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

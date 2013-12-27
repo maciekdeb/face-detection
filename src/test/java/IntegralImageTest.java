@@ -1,11 +1,9 @@
 import junit.framework.Assert;
 import org.junit.Test;
-import pl.lodz.p.ics.model.IntegralImage;
+import pl.lodz.p.ics.model.classification.IntegralImage;
 import pl.lodz.p.ics.model.Point;
 
 import java.awt.image.BufferedImage;
-
-import static org.junit.Assert.*;
 
 /**
  * User: maciek

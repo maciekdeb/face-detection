@@ -1,4 +1,6 @@
-package pl.lodz.p.ics.model;
+package pl.lodz.p.ics.model.classification;
+
+import pl.lodz.p.ics.model.Point;
 
 import java.awt.image.BufferedImage;
 
@@ -25,6 +27,10 @@ public class IntegralImage {
                 }
             }
         }
+    }
+
+    public double getFieldValue(Field field) {
+        return getRectangleValue(field.getTopLeftPoint(), field.getBottomRightPoint());
     }
 
     public double getRectangleValue(Point topLeft, Point bottomRight) {

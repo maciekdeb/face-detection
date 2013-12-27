@@ -1,4 +1,4 @@
-package pl.lodz.p.ics.model;
+package pl.lodz.p.ics.model.transform;
 
 /**
  * User: maciek

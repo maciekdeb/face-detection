@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import pl.lodz.p.ics.model.transform.Ellipse;
 
 import java.net.URL;
 import java.util.ArrayList;

@@ -1,6 +1,8 @@
-package pl.lodz.p.ics.model;
+package pl.lodz.p.ics.model.transform;
 
 import pl.lodz.p.ics.Utils;
+import pl.lodz.p.ics.model.Point;
+import pl.lodz.p.ics.model.Vector;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

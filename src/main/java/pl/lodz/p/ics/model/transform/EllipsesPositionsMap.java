@@ -1,6 +1,7 @@
-package pl.lodz.p.ics.model;
+package pl.lodz.p.ics.model.transform;
 
 import pl.lodz.p.ics.HoughTransform;
+import pl.lodz.p.ics.model.Point;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
