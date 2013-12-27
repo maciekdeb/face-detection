@@ -12,7 +12,8 @@ import java.util.List;
 public class Classifier {
 
     private List<WeakClassifier> weakClassifiers;
-    private double[] x;
+//    private double[] x;
+    private IntegralImage[] x;
     private double[] y;
     private double[] D;
     private int m;
@@ -20,13 +21,15 @@ public class Classifier {
     private WeakClassifier[] outputClassifiers;
     private double[] outputAlfa;
 
-    public Classifier(List<Feature> features, double[] x, double[] y) {
+    public Classifier(List<Feature> features, IntegralImage[] x, double[] y) {
 
         if (x.length != y.length) {
             throw new IllegalArgumentException();
         }
         this.m = x.length;
         this.D = new double[m];
+        this.x = x;
+        this.y = y;
 
         for (int i = 0; i < features.size(); i++) {
             WeakClassifier weakClassifier = new WeakClassifier();
@@ -68,11 +71,11 @@ public class Classifier {
         }
     }
 
-    public int value(IntegralImage integralImage, Point topLeftPoint, Point bottomRightPoint) {
+    public int detect(IntegralImage integralImage, Point relativePoint) {
         double value = 0;
 
         for (int i = 0; i < outputClassifiers.length; i++) {
-            value += outputAlfa[i] * outputClassifiers[i].value(x);
+            value += outputAlfa[i] * outputClassifiers[i].value(integralImage, relativePoint);
         }
 
         return (int) Math.copySign(1.0, value);

@@ -20,14 +20,14 @@ public class Feature {
         this.fields = fields;
     }
 
-    public double value(IntegralImage integralImage, Point topLeftPoint, Point bottomRightPoint) {
+    public double value(IntegralImage integralImage, Point relativePoint) {
 
         double value = 0;
 
         for (Field field : fields) {
 
-            Point pointA = field.getTopLeftPoint().add(topLeftPoint);
-            Point pointB = field.getBottomRightPoint().add(bottomRightPoint);
+            Point pointA = field.getTopLeftPoint().add(relativePoint);
+            Point pointB = field.getBottomRightPoint().add(relativePoint);
 
             value += field.getWeight() * integralImage.getRectangleValue(pointA, pointB);
         }
