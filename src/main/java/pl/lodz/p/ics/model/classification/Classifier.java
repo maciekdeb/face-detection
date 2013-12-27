@@ -12,7 +12,6 @@ import java.util.List;
 public class Classifier {
 
     private List<WeakClassifier> weakClassifiers;
-//    private double[] x;
     private IntegralImage[] x;
     private double[] y;
     private double[] D;
@@ -71,6 +70,7 @@ public class Classifier {
         }
     }
 
+    //TODO skalowalne feature
     public int detect(IntegralImage integralImage, Point relativePoint) {
         double value = 0;
 
