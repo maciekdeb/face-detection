@@ -43,6 +43,14 @@ public class Point implements Comparable {
         this.color = color;
     }
 
+    public Point add(int x, int y) {
+        return new Point(this.getX() + x, this.getY() + y);
+    }
+
+    public Point add(Point other) {
+        return new Point(this.getX() + other.getX(), this.getY() + other.getY());
+    }
+
     @Override
     public String toString() {
         return "Point{" +
@@ -62,8 +70,25 @@ public class Point implements Comparable {
         return a > b ? +1 : a < b ? -1 : 0;
     }
 
-    public Point add(Point other) {
-        return new Point(this.getX() + other.getX(), this.getY() + other.getY());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Point point = (Point) o;
+
+        if (color != point.color) return false;
+        if (x != point.x) return false;
+        if (y != point.y) return false;
+
+        return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + y;
+        result = 31 * result + color;
+        return result;
+    }
 }
