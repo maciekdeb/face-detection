@@ -22,9 +22,9 @@ public class FeatureTest {
 
         FeatureGenerator featureGenerator = new FeatureGenerator();
 
-        List<Feature> featureList = featureGenerator.loadReferenceFeatures(Collections.singletonList("features/feature5-scheme.xml"));
+        List<Feature> featureList = featureGenerator.loadReferenceFeatures(Collections.singletonList("features/feature7-scheme.xml"));
 
-        List<Feature> generatedFeatures = featureGenerator.generateFeaturesCollection(featureList, 8, 8, 1, 1, 1, 1);
+        List<Feature> generatedFeatures = featureGenerator.generateFeaturesCollection(featureList, 10, 10, 1, 1, 1, 1);
         Utils.drawFeature(generatedFeatures, 10);
 
     }
