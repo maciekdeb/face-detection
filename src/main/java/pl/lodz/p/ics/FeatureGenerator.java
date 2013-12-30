@@ -74,12 +74,13 @@ public class FeatureGenerator {
             List<Field> resizedFields = feature.getFields();
             Point bottomPoint = feature.getFeatureMaxPoint();
 
-            for (int i = 0; i + bottomPoint.getX() < width; i += xMoving) {
-                for (int j = 0; j + bottomPoint.getY() < height; j += yMoving) {
+            for (int i = 0; i + bottomPoint.getX() < width - 1; i += xMoving) {
+
+                for (int j = 0; j + bottomPoint.getY() < height - 1; j += yMoving) {
 
                     List<Field> fields = new ArrayList<Field>();
                     for (Field field : resizedFields) {
-                        fields.add(new Field(field.getTopLeftPoint().add(i, j), field.getBottomRightPoint().add(i, j), field.getWeight()));                       ;
+                        fields.add(new Field(field.getTopLeftPoint().add(i, j), field.getBottomRightPoint().add(i, j), field.getWeight()));
                     }
 
                     Feature movedFeature = new Feature(fields);

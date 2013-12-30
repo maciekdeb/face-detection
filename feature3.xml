@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<feature>
+    <width>6</width>
+    <height>6</height>
+    <fields>
+        <field>
+            <bottomRightPoint>
+                <color>0</color>
+                <x>3</x>
+                <y>2</y>
+            </bottomRightPoint>
+            <topLeftPoint>
+                <color>0</color>
+                <x>1</x>
+                <y>1</y>
+            </topLeftPoint>
+            <weight>-1</weight>
+        </field>
+        <field>
+            <bottomRightPoint>
+                <color>0</color>
+                <x>3</x>
+                <y>4</y>
+            </bottomRightPoint>
+            <topLeftPoint>
+                <color>0</color>
+                <x>1</x>
+                <y>3</y>
+            </topLeftPoint>
+            <weight>1</weight>
+        </field>
+    </fields>
+</feature>

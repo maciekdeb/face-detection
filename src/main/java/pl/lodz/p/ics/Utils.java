@@ -89,12 +89,11 @@ public class Utils {
         int i = 0;
         for (Feature f : features) {
 
-            BufferedImage bufferedImage = new BufferedImage((f.getWidth() + 1) * scale, (f.getHeight() + 1) * scale, BufferedImage.TYPE_INT_BGR);
+            BufferedImage bufferedImage = new BufferedImage((f.getWidth()) * scale, (f.getHeight()) * scale, BufferedImage.TYPE_INT_BGR);
 
             Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
-//            g.setBackground(Color.GRAY);
             g.setColor(Color.GRAY);
-            g.fillRect(0, 0, (f.getWidth() + 1) * scale, (f.getHeight() + 1) * scale);
+            g.fillRect(0, 0, (f.getWidth()) * scale, (f.getHeight()) * scale);
 
             for (Field field : f.getFields()) {
                 if (field.getWeight() == -1) {
@@ -106,7 +105,7 @@ public class Utils {
                 Point a = field.getTopLeftPoint();
                 Point b = field.getBottomRightPoint();
 
-                g.fillRect(a.getX() * scale, a.getY() * scale, (b.getX() - a.getX() + 1) * scale - 1, (b.getY() - a.getY() + 1) * scale - 1);
+                g.fillRect(a.getX() * scale, a.getY() * scale, ((b.getX() - a.getX()) + 1) * scale, ((b.getY() - a.getY()) + 1) * scale);
             }
 
             File outputfile = new File("image" + (i++) + ".jpg");
