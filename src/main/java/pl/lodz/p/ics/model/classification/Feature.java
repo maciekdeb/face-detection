@@ -54,9 +54,9 @@ public class Feature {
             Point bottom = field.getBottomRightPoint();
             if (bottom.getX() > maxPoint.getX()) {
                 maxPoint.setX(bottom.getX());
-                if (bottom.getY() > maxPoint.getY()) {
-                    maxPoint.setY(bottom.getY());
-                }
+            }
+            if (bottom.getY() > maxPoint.getY()) {
+                maxPoint.setY(bottom.getY());
             }
 
         }

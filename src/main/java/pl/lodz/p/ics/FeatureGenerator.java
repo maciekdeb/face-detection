@@ -80,7 +80,8 @@ public class FeatureGenerator {
 
                     List<Field> fields = new ArrayList<Field>();
                     for (Field field : resizedFields) {
-                        fields.add(new Field(field.getTopLeftPoint().add(i, j), field.getBottomRightPoint().add(i, j), field.getWeight()));
+                        Field movedField = new Field(field.getTopLeftPoint().add(i, j), field.getBottomRightPoint().add(i, j), field.getWeight());
+                        fields.add(movedField);
                     }
 
                     Feature movedFeature = new Feature(fields);
