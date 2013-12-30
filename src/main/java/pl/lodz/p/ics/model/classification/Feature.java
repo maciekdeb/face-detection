@@ -2,9 +2,7 @@ package pl.lodz.p.ics.model.classification;
 
 import pl.lodz.p.ics.model.Point;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
 /**
@@ -13,11 +11,18 @@ import java.util.List;
  * Time: 15:53
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Feature {
 
     @XmlElementWrapper(name = "fields")
     @XmlElement(name = "field")
     private List<Field> fields;
+
+    @XmlElement
+    private int width;
+
+    @XmlElement
+    private int height;
 
     public Feature() {
     }
@@ -64,6 +69,22 @@ public class Feature {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override

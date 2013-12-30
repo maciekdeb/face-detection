@@ -1,7 +1,15 @@
 package pl.lodz.p.ics;
 
+import pl.lodz.p.ics.model.*;
+import pl.lodz.p.ics.model.Point;
+import pl.lodz.p.ics.model.classification.Feature;
+import pl.lodz.p.ics.model.classification.Field;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +82,43 @@ public class Utils {
         graphics.setColor(Color.BLACK);
         graphics.drawLine(x, y, (int) (x + distance * Math.cos(radians)), (int) (y + distance * Math.sin(radians)));
         graphics.drawLine(x, y, (int) (x + distance * Math.cos(radians + Math.PI)), (int) (y + distance * Math.sin(radians + Math.PI)));
+    }
+
+    public static void drawFeature(List<Feature> features, int scale) {
+
+        int i = 0;
+        for (Feature f : features) {
+
+            BufferedImage bufferedImage = new BufferedImage((f.getWidth() + 1) * scale, (f.getHeight() + 1) * scale, BufferedImage.TYPE_INT_BGR);
+
+            Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
+//            g.setBackground(Color.GRAY);
+            g.setColor(Color.GRAY);
+            g.fillRect(0, 0, (f.getWidth() + 1) * scale, (f.getHeight() + 1) * scale);
+
+            for (Field field : f.getFields()) {
+                if (field.getWeight() == -1) {
+                    g.setColor(Color.BLACK);
+                } else if (field.getWeight() == 1) {
+                    g.setColor(Color.WHITE);
+                }
+
+                Point a = field.getTopLeftPoint();
+                Point b = field.getBottomRightPoint();
+
+                g.fillRect(a.getX() * scale, a.getY() * scale, (b.getX() - a.getX() + 1) * scale - 1, (b.getY() - a.getY() + 1) * scale - 1);
+            }
+
+            File outputfile = new File("image" + (i++) + ".jpg");
+
+            try {
+                ImageIO.write(bufferedImage, "jpg", outputfile);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+
     }
 
 }

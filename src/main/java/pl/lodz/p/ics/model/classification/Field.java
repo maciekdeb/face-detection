@@ -81,4 +81,13 @@ public class Field {
         result = 31 * result + weight;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Field{" +
+                "bottomRightPoint=" + bottomRightPoint +
+                ", topLeftPoint=" + topLeftPoint +
+                ", weight=" + weight +
+                '}';
+    }
 }

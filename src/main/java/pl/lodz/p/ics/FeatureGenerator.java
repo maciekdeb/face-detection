@@ -24,7 +24,7 @@ public class FeatureGenerator {
 
     }
 
-    public static List<Feature> generateFeaturesCollection(List<Feature> featuresReference, int width, int height, int xSizing, int ySizing, int xMoving, int yMoving) {
+    public List<Feature> generateFeaturesCollection(List<Feature> featuresReference, int width, int height, int xSizing, int ySizing, int xMoving, int yMoving) {
 
         List<Feature> resizedFeatures = new ArrayList<Feature>();
 
@@ -35,12 +35,28 @@ public class FeatureGenerator {
             Point bottomPoint = referenceFeature.getFeatureMaxPoint();
 
             //TODO TEST
-            for (int i = 0; i + bottomPoint.getX() < width; i += xSizing) {
+            for (int i = 0; i + i + bottomPoint.getX() < width; i += xSizing) {
                 for (int j = 0; j + bottomPoint.getY() < height; j += ySizing) {
 
                     List<Field> fields = new ArrayList<Field>();
                     for (Field field : referencefields) {
-                        fields.add(new Field(new Point(field.getTopLeftPoint().getX(), field.getTopLeftPoint().getY()), field.getBottomRightPoint().add(i, j), field.getWeight()));
+
+                        Point topleft = field.getTopLeftPoint();
+                        Point bottomRight = field.getBottomRightPoint().add(i, j);
+
+                        if (topleft.getX() != 1) {
+                            topleft = topleft.add(i, 0);
+                            bottomRight = bottomRight.add(i, 0);
+                        }
+
+                        if (topleft.getY() != 1) {
+                            topleft = topleft.add(0, j);
+                            bottomRight = bottomRight.add(0, j);
+                        }
+
+                        Field resizedField = new Field(topleft, bottomRight, field.getWeight());
+                        fields.add(resizedField);
+
                     }
 
                     Feature resizedFeature = new Feature(fields);
@@ -58,8 +74,8 @@ public class FeatureGenerator {
             List<Field> resizedFields = feature.getFields();
             Point bottomPoint = feature.getFeatureMaxPoint();
 
-            for (int i = 0; i + bottomPoint.getX() < width - 1; i += xMoving) {
-                for (int j = 0; j + bottomPoint.getY() < height - 1; j += yMoving) {
+            for (int i = 0; i + bottomPoint.getX() < width; i += xMoving) {
+                for (int j = 0; j + bottomPoint.getY() < height; j += yMoving) {
 
                     List<Field> fields = new ArrayList<Field>();
                     for (Field field : resizedFields) {
@@ -67,6 +83,8 @@ public class FeatureGenerator {
                     }
 
                     Feature movedFeature = new Feature(fields);
+                    movedFeature.setHeight(height);
+                    movedFeature.setWidth(width);
                     resultFeatures.add(movedFeature);
                 }
             }
