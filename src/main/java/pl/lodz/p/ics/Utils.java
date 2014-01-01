@@ -39,6 +39,10 @@ public class Utils {
         }
     }
 
+    public static int convertRGB(int a) {
+        return (a >> 8) & 0xFF;
+    }
+
     public static int[][] convertRGB(double[][] input) {
         int width = input[0].length;
         int height = input.length;
@@ -84,7 +88,7 @@ public class Utils {
         graphics.drawLine(x, y, (int) (x + distance * Math.cos(radians + Math.PI)), (int) (y + distance * Math.sin(radians + Math.PI)));
     }
 
-    public static void drawFeature(List<Feature> features, int scale) {
+    public static void drawFeature(List<Feature> features, String prefix, int scale) {
 
         int i = 0;
         for (Feature f : features) {
@@ -108,7 +112,7 @@ public class Utils {
                 g.fillRect(a.getX() * scale, a.getY() * scale, ((b.getX() - a.getX()) + 1) * scale, ((b.getY() - a.getY()) + 1) * scale);
             }
 
-            File outputfile = new File("image" + (i++) + ".jpg");
+            File outputfile = new File(prefix + "-" + (i++) + ".jpg");
 
             try {
                 ImageIO.write(bufferedImage, "jpg", outputfile);

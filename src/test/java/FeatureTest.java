@@ -22,10 +22,16 @@ public class FeatureTest {
 
         FeatureGenerator featureGenerator = new FeatureGenerator();
 
-        List<Feature> featureList = featureGenerator.loadReferenceFeatures(Collections.singletonList("features/feature7-scheme.xml"));
+        String whichFeature = "feature1";
 
-        List<Feature> generatedFeatures = featureGenerator.generateFeaturesCollection(featureList, 10, 10, 1, 1, 1, 1);
-        Utils.drawFeature(generatedFeatures, 10);
+        List<Feature> featureList = featureGenerator.loadReferenceFeatures(Collections.singletonList("features/" + whichFeature + "/" + whichFeature + "-scheme.xml"));
+
+        List<Feature> generatedFeatures = featureGenerator.generateResizedFeatures(featureList, 24, 24, 1, 1);
+        generatedFeatures = featureGenerator.generateMovedFeatures(generatedFeatures, 24, 24, 2, 2);
+
+        featureGenerator.saveFeature(generatedFeatures, "features/" + whichFeature + "/xml/" + whichFeature);
+
+        Utils.drawFeature(generatedFeatures, "features/" + whichFeature + "/images/" + whichFeature, 10);
 
     }
 

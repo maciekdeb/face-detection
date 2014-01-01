@@ -46,6 +46,26 @@ public class Feature {
         return value;
     }
 
+    public int getMaxXRow() {
+        int max = 1;
+        for (Field f : fields) {
+            if (f.getRowX() > max) {
+                max = f.getRowX();
+            }
+        }
+        return max;
+    }
+
+    public int getMaxYColumn() {
+        int max = 1;
+        for (Field f : fields) {
+            if (f.getColumnY() > max) {
+                max = f.getColumnY();
+            }
+        }
+        return max;
+    }
+
     public Point getFeatureMaxPoint() {
 
         Point maxPoint = new Point(0, 0);

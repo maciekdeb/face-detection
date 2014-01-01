@@ -18,13 +18,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Field {
 
     @XmlElement
-    public Point bottomRightPoint;
+    private Point bottomRightPoint;
 
     @XmlElement
-    public Point topLeftPoint;
+    private Point topLeftPoint;
 
     @XmlElement
-    public int weight;
+    private int weight;
+
+    @XmlElement
+    private int rowX;
+
+    @XmlElement
+    private int columnY;
 
     public Field() {
 
@@ -58,6 +64,22 @@ public class Field {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public int getRowX() {
+        return rowX;
+    }
+
+    public void setRowX(int rowX) {
+        this.rowX = rowX;
+    }
+
+    public int getColumnY() {
+        return columnY;
+    }
+
+    public void setColumnY(int columnY) {
+        this.columnY = columnY;
     }
 
     @Override

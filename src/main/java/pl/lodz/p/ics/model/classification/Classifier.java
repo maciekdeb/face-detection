@@ -2,6 +2,7 @@ package pl.lodz.p.ics.model.classification;
 
 import pl.lodz.p.ics.model.Point;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,10 +63,14 @@ public class Classifier {
             outputClassifiers[t] = weakClassifier;
 
             for (int i = 0; i < m; i++) {
-
-                //TODO dodac dzielnik?
                 D[i] = D[i] * Math.exp(outputAlfa[t] * (2 * indicatorFunction(y[i], weakClassifier.value(x[i])) - 1));
-
+            }
+            double den = 0;
+            for (double d : D) {
+                den += d;
+            }
+            for (int i = 0; i < m; i++) {
+                D[i] = D[i] / den;
             }
         }
     }

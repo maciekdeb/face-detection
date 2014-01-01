@@ -51,6 +51,18 @@ public class Point implements Comparable {
         return new Point(this.getX() + other.getX(), this.getY() + other.getY());
     }
 
+    public Point multiply(int x, int y) {
+        return new Point(this.getX() * x, this.getY() * y);
+    }
+
+    public Point sub(int x, int y) {
+        return new Point(this.getX() - x, this.getY() - y);
+    }
+
+    public Point sub(Point other) {
+        return new Point(this.getX() - other.getX(), this.getY() - other.getY());
+    }
+
     @Override
     public String toString() {
         return "Point{" +
