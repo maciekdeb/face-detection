@@ -24,8 +24,7 @@ public class Feature {
     @XmlElement
     private int height;
 
-    public Feature() {
-    }
+    public Feature() {}
 
     public Feature(List<Field> fields) {
         this.fields = fields;

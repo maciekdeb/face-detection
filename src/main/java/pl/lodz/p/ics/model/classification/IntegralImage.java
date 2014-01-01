@@ -13,7 +13,7 @@ public class IntegralImage {
 
     private double[][] integralImage;
 
-    public IntegralImage(BufferedImage bufferedImage) {
+    public IntegralImage(BufferedImage bufferedImage, double denominator) {
 
         this.integralImage = new double[bufferedImage.getHeight()][bufferedImage.getWidth()];
 
@@ -22,15 +22,12 @@ public class IntegralImage {
                 for (int i = 0; i <= x; i++) {
                     for (int j = 0; j <= y; j++) {
                         //TODO
-                        integralImage[y][x] += bufferedImage.getRGB(i, j);
+                        integralImage[y][x] += ((bufferedImage.getRGB(i, j) >> 8) & 0xFF) / denominator;
+
                     }
                 }
             }
         }
-    }
-
-    public double getFieldValue(Field field) {
-        return getRectangleValue(field.getTopLeftPoint(), field.getBottomRightPoint());
     }
 
     public double getRectangleValue(Point topLeft, Point bottomRight) {

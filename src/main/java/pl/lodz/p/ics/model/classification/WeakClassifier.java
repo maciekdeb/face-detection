@@ -11,6 +11,12 @@ public class WeakClassifier {
 
     private Feature feature;
 
+    public WeakClassifier() {}
+
+    public WeakClassifier(Feature feature) {
+        this.feature = feature;
+    }
+
     public double value(IntegralImage integralImage) {
         return activateFunction(feature.value(integralImage, new Point(0, 0)));
     }

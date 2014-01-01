@@ -36,7 +36,7 @@ public class IntegralImageTest {
             System.out.print("\n");
         }
 
-        IntegralImage integralImage = new IntegralImage(image);
+        IntegralImage integralImage = new IntegralImage(image, 1d);
 
         for (int i = 0; i < integralImage.getIntegralImage().length; i++) {
             for (int j = 0; j < integralImage.getIntegralImage()[i].length; j++) {
