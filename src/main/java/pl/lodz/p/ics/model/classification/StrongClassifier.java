@@ -10,18 +10,20 @@ import java.util.List;
  * Date: 21.12.13
  * Time: 17:48
  */
-public class Classifier {
+public class StrongClassifier {
 
     private List<WeakClassifier> weakClassifiers;
+
     private IntegralImage[] x;
     private double[] y;
+
     private double[] D;
     private int m;
 
     private WeakClassifier[] outputClassifiers;
     private double[] outputAlfa;
 
-    public Classifier(List<Feature> features, IntegralImage[] x, double[] y) {
+    public StrongClassifier(List<Feature> features, IntegralImage[] x, double[] y) {
 
         if (x.length != y.length) {
             throw new IllegalArgumentException();
@@ -108,4 +110,43 @@ public class Classifier {
         return 0d;
     }
 
+    public List<WeakClassifier> getWeakClassifiers() {
+        return weakClassifiers;
+    }
+
+    public void setWeakClassifiers(List<WeakClassifier> weakClassifiers) {
+        this.weakClassifiers = weakClassifiers;
+    }
+
+    public double[] getD() {
+        return D;
+    }
+
+    public void setD(double[] d) {
+        D = d;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public void setM(int m) {
+        this.m = m;
+    }
+
+    public WeakClassifier[] getOutputClassifiers() {
+        return outputClassifiers;
+    }
+
+    public void setOutputClassifiers(WeakClassifier[] outputClassifiers) {
+        this.outputClassifiers = outputClassifiers;
+    }
+
+    public double[] getOutputAlfa() {
+        return outputAlfa;
+    }
+
+    public void setOutputAlfa(double[] outputAlfa) {
+        this.outputAlfa = outputAlfa;
+    }
 }
