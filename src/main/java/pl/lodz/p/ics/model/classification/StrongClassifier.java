@@ -4,7 +4,6 @@ import pl.lodz.p.ics.model.DataSample;
 import pl.lodz.p.ics.model.Point;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,81 +13,127 @@ import java.util.List;
  */
 public class StrongClassifier {
 
-    private List<WeakClassifier> weakClassifiers;
+    private List<WeakClassifier> candidateWeakClassifiers;
 
     private List<DataSample> dataSamples;
 
-    private double[] D;
+    /**
+     * weights
+     */
+    private double[] w;
+
+    /**
+     * number o examples (negative (m) + positive (l))
+     */
+    private int n;
     private int m;
+    private int l;
 
-    private WeakClassifier[] outputClassifiers;
-    private double[] outputAlfa;
+    private WeakClassifier[] weakClassifiers;
+    private double[] alfaFactor;
 
-    public StrongClassifier(List<Feature> features, List<DataSample> dataSamples) {
-        this.m = dataSamples.size();
-        this.D = new double[m];
-        this.dataSamples = dataSamples;
-        this.weakClassifiers = new ArrayList<>();
+    public StrongClassifier(List<Feature> features, List<DataSample> positiveSamples, List<DataSample> negativeSamples) {
 
+        this.l = positiveSamples.size();
+        this.m = negativeSamples.size();
+        this.n = l + m;
+
+        this.w = new double[n];
+
+        this.dataSamples = new ArrayList<>();
+        this.dataSamples.addAll(positiveSamples);
+        this.dataSamples.addAll(negativeSamples);
+
+        this.candidateWeakClassifiers = new ArrayList<>();
         for (int i = 0; i < features.size(); i++) {
-            WeakClassifier weakClassifier = new WeakClassifier();
-            weakClassifier.setFeature(features.get(i));
-            weakClassifiers.add(weakClassifier);
+            candidateWeakClassifiers.add(new WeakClassifier(features.get(i), 0));
         }
 
-        for (int i = 0; i < m; i++) {
-            D[i] = 1d / m;
-        }
     }
 
     public void learn(int numberOfIteration) {
 
-        outputClassifiers = new WeakClassifier[numberOfIteration];
-        outputAlfa = new double[numberOfIteration];
+        weakClassifiers = new WeakClassifier[numberOfIteration];
+        alfaFactor = new double[numberOfIteration];
 
-        for (int t = 0; t < numberOfIteration; t++) {
+        initializeWeights(w);
 
+        for (int t = 1; t <= numberOfIteration; t++) {
             System.out.println("\nEpoka " + t);
 
-            double[] errors = new double[weakClassifiers.size()];
-            double[] eta = new double[weakClassifiers.size()];
+            normalizeWeights(w);
 
-            for (int j = 0; j < weakClassifiers.size(); j++) {
-                WeakClassifier weakClassifier = weakClassifiers.get(j);
-                for (int i = 0; i < m; i++) {
-                    errors[j] += D[i] * indicatorFunction(weakClassifier.value(dataSamples.get(i).getIntegralImage()), dataSamples.get(i).getY());
+            // 2. SELECT WEAK CLASSIFIER
+
+            // 3. DEFINE h_t(x)
+
+            double[] errors = new double[candidateWeakClassifiers.size()];
+            double[] eta = new double[candidateWeakClassifiers.size()];
+
+            for (int j = 0; j < candidateWeakClassifiers.size(); j++) {
+                WeakClassifier weakClassifier = candidateWeakClassifiers.get(j);
+                for (int i = 0; i < n; i++) {
+                    DataSample ds = dataSamples.get(i);
+                    errors[j] += w[i] * indicatorFunction(weakClassifier.value(ds.getIntegralImage()), ds.getY());
                 }
                 eta[j] = Math.abs(0.5 - errors[j]);
             }
 
             int classifierNumber = findMaxIndex(eta);
-            WeakClassifier weakClassifier = weakClassifiers.get(classifierNumber);
+            WeakClassifier weakClassifier = candidateWeakClassifiers.get(classifierNumber);
 
-            outputAlfa[t] = 1 / 2 * Math.log((1 - errors[classifierNumber]) / errors[classifierNumber]);
-            outputClassifiers[t] = weakClassifier;
+            alfaFactor[t - 1] = Math.log((1 - errors[classifierNumber]) / errors[classifierNumber]);
+            weakClassifiers[t - 1] = weakClassifier;
 
-            for (int i = 0; i < m; i++) {
-                D[i] = D[i] * Math.exp(outputAlfa[t] * (2 * indicatorFunction(dataSamples.get(i).getY(), weakClassifier.value(dataSamples.get(i).getIntegralImage())) - 1));
-            }
-            double den = 0;
-            for (double d : D) {
-                den += d;
-            }
-            for (int i = 0; i < m; i++) {
-                D[i] = D[i] / den;
-            }
+            // 4. UPDATE THE WEIGHTS
+            updateWeights(w, errors[classifierNumber], weakClassifier);
+
         }
     }
 
-    //TODO skalowalne feature
+    public void updateWeights(double[] w, double error, WeakClassifier weakClassifier) {
+        for (int i = 0; i < n; i++) {
+
+            DataSample ds = dataSamples.get(i);
+            double value = weakClassifier.value(ds.getIntegralImage());
+
+            double base = error / (1.0 - error);
+            double exponent = 1.0 - (value == ds.getY() ? 0.0 : 1.0);
+
+            w[i] *= Math.pow(base, exponent);
+
+        }
+    }
+
+    public void initializeWeights(double[] w) {
+        for (int i = 0; i < l; i++) {
+            w[i] = 1.0 / (2.0 * l);
+        }
+        for (int i = l; i < m + l; i++) {
+            w[i] = 1.0 / (2.0 * m);
+        }
+    }
+
+    public void normalizeWeights(double[] t) {
+        double sum = 0;
+        for (double d : t) {
+            sum += d;
+        }
+        for (int i = 0; i < t.length; i++) {
+            t[i] /= sum;
+        }
+    }
+
     public int detect(IntegralImage integralImage, Point relativePoint) {
         double value = 0;
+        double alfaSum = 0;
 
-        for (int i = 0; i < outputClassifiers.length; i++) {
-            value += outputAlfa[i] * outputClassifiers[i].value(integralImage, relativePoint);
+        for (int i = 0; i < weakClassifiers.length; i++) {
+            value += alfaFactor[i] * weakClassifiers[i].value(integralImage, relativePoint);
+            alfaSum += alfaFactor[i];
         }
 
-        return (int) Math.copySign(1.0, value);
+        return (value >= (0.5 * alfaSum) ? 1 : 0);
     }
 
     public int findMaxIndex(double[] array) {
@@ -113,43 +158,19 @@ public class StrongClassifier {
         return 0d;
     }
 
-    public List<WeakClassifier> getWeakClassifiers() {
+    public WeakClassifier[] getWeakClassifiers() {
         return weakClassifiers;
     }
 
-    public void setWeakClassifiers(List<WeakClassifier> weakClassifiers) {
+    public void setWeakClassifiers(WeakClassifier[] weakClassifiers) {
         this.weakClassifiers = weakClassifiers;
     }
 
-    public double[] getD() {
-        return D;
+    public double[] getAlfaFactor() {
+        return alfaFactor;
     }
 
-    public void setD(double[] d) {
-        D = d;
-    }
-
-    public int getM() {
-        return m;
-    }
-
-    public void setM(int m) {
-        this.m = m;
-    }
-
-    public WeakClassifier[] getOutputClassifiers() {
-        return outputClassifiers;
-    }
-
-    public void setOutputClassifiers(WeakClassifier[] outputClassifiers) {
-        this.outputClassifiers = outputClassifiers;
-    }
-
-    public double[] getOutputAlfa() {
-        return outputAlfa;
-    }
-
-    public void setOutputAlfa(double[] outputAlfa) {
-        this.outputAlfa = outputAlfa;
+    public void setAlfaFactor(double[] alfaFactor) {
+        this.alfaFactor = alfaFactor;
     }
 }

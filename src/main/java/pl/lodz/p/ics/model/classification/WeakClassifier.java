@@ -10,11 +10,13 @@ import pl.lodz.p.ics.model.Point;
 public class WeakClassifier {
 
     private Feature feature;
+    private double threshold;
 
     public WeakClassifier() {}
 
-    public WeakClassifier(Feature feature) {
+    public WeakClassifier(Feature feature, double threshold) {
         this.feature = feature;
+        this.threshold = threshold;
     }
 
     public double value(IntegralImage integralImage) {
@@ -26,10 +28,10 @@ public class WeakClassifier {
     }
 
     public double activateFunction(double x) {
-        if (x > 0) {
+        if (x < threshold) {
             return 1;
         }
-        return -1;
+        return 0;
     }
 
     public Feature getFeature() {

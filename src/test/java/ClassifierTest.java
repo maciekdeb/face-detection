@@ -1,7 +1,7 @@
 import org.junit.Test;
-import pl.lodz.p.ics.FeatureGenerator;
 import pl.lodz.p.ics.Utils;
 import pl.lodz.p.ics.model.DataSample;
+import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.classification.*;
 
 import java.io.File;
@@ -21,10 +21,7 @@ public class ClassifierTest {
     public void testPasses() throws IOException {
 
         List<DataSample> dataSamplesFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/face/"), 1.0);
-        List<DataSample> dataSamplesNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/non-face/"), -1.0);
-        List<DataSample> dataSamples = new ArrayList<>();
-        dataSamples.addAll(dataSamplesFaces);
-        dataSamples.addAll(dataSamplesNonFaces);
+        List<DataSample> dataSamplesNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/non-face/"), 0.0);
         System.out.println("Zbiór treningowy\nIlość próbek twarzy: " + dataSamplesFaces.size() + "\nIlość próbek nie twarzy: "+dataSamplesNonFaces.size());
 
         List<Feature> features1 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature1/xml/"));
@@ -45,11 +42,25 @@ public class ClassifierTest {
         System.out.println("\nLiczba cech:\n1-rodzaju: " + features1.size() + "\n2-rodzaju: " + features2.size() + "\n3-rodzaju: " + features3.size() + "\n4-rodzaju: " + features4.size() + "\n5-rodzaju: " + features5.size() + "\n6-rodzaju: " + features6.size() + "\n7-rodzaju: " + features7.size());
 
 
-        StrongClassifier strongClassifier = new StrongClassifier(features, dataSamples);
-        strongClassifier.learn(5);
+        StrongClassifier strongClassifier = new StrongClassifier(features, dataSamplesFaces, dataSamplesNonFaces);
+        strongClassifier.learn(100);
 
-        System.out.println("\nWartosci wspolczynnikow klasyfikatora silnego: " + Arrays.toString(strongClassifier.getOutputAlfa()));
-        System.out.println("\nKlasyfikatory slabe: " + Arrays.toString(strongClassifier.getOutputClassifiers()));
+        System.out.print("\nWartosci wspolczynnikow klasyfikatora silnego: ");
+        for (double d : strongClassifier.getAlfaFactor()) {
+            System.out.print(d + " ");
+        }
+        System.out.println("\nKlasyfikatory slabe: " + Arrays.toString(strongClassifier.getWeakClassifiers()));
+
+
+        System.out.println(strongClassifier.detect(dataSamplesFaces.get(50).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesFaces.get(40).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesFaces.get(30).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesFaces.get(20).getIntegralImage(), new Point(0, 0)));
+
+        System.out.println(strongClassifier.detect(dataSamplesNonFaces.get(50).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesNonFaces.get(40).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesNonFaces.get(30).getIntegralImage(), new Point(0, 0)));
+        System.out.println(strongClassifier.detect(dataSamplesNonFaces.get(20).getIntegralImage(), new Point(0, 0)));
     }
 
 }
