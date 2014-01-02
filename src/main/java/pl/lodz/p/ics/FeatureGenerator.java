@@ -94,25 +94,7 @@ public class FeatureGenerator {
         return resizedFeatures;
     }
 
-    public List<Feature> loadReferenceFeatures(List<String> fileNames) {
 
-        List<Feature> features = new ArrayList<Feature>();
-
-        try {
-
-            JAXBContext context = JAXBContext.newInstance(Feature.class);
-
-            for (String name : fileNames) {
-                Unmarshaller um = context.createUnmarshaller();
-                features.add((Feature) um.unmarshal(new File(name)));
-            }
-
-        } catch (JAXBException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        return features;
-    }
 
     public void saveFeature(List<Feature> features, String prefix) {
 

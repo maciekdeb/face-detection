@@ -1,12 +1,8 @@
-import junit.framework.Assert;
 import org.junit.Test;
 import pl.lodz.p.ics.FeatureGenerator;
 import pl.lodz.p.ics.Utils;
-import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.classification.Feature;
-import pl.lodz.p.ics.model.classification.IntegralImage;
 
-import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +20,7 @@ public class FeatureTest {
 
         String whichFeature = "feature1";
 
-        List<Feature> featureList = featureGenerator.loadReferenceFeatures(Collections.singletonList("features/" + whichFeature + "/" + whichFeature + "-scheme.xml"));
+        List<Feature> featureList = Utils.loadFeatures(Collections.singletonList("features/" + whichFeature + "/" + whichFeature + "-scheme.xml"));
 
         List<Feature> generatedFeatures = featureGenerator.generateResizedFeatures(featureList, 24, 24, 1, 1);
         generatedFeatures = featureGenerator.generateMovedFeatures(generatedFeatures, 24, 24, 2, 2);

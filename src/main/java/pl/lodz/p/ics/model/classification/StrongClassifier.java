@@ -1,7 +1,9 @@
 package pl.lodz.p.ics.model.classification;
 
+import pl.lodz.p.ics.model.DataSample;
 import pl.lodz.p.ics.model.Point;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,8 +16,7 @@ public class StrongClassifier {
 
     private List<WeakClassifier> weakClassifiers;
 
-    private IntegralImage[] x;
-    private double[] y;
+    private List<DataSample> dataSamples;
 
     private double[] D;
     private int m;
@@ -23,37 +24,39 @@ public class StrongClassifier {
     private WeakClassifier[] outputClassifiers;
     private double[] outputAlfa;
 
-    public StrongClassifier(List<Feature> features, IntegralImage[] x, double[] y) {
-
-        if (x.length != y.length) {
-            throw new IllegalArgumentException();
-        }
-        this.m = x.length;
+    public StrongClassifier(List<Feature> features, List<DataSample> dataSamples) {
+        this.m = dataSamples.size();
         this.D = new double[m];
-        this.x = x;
-        this.y = y;
+        this.dataSamples = dataSamples;
+        this.weakClassifiers = new ArrayList<>();
 
         for (int i = 0; i < features.size(); i++) {
             WeakClassifier weakClassifier = new WeakClassifier();
             weakClassifier.setFeature(features.get(i));
             weakClassifiers.add(weakClassifier);
+        }
+
+        for (int i = 0; i < m; i++) {
             D[i] = 1d / m;
         }
     }
 
     public void learn(int numberOfIteration) {
 
+        outputClassifiers = new WeakClassifier[numberOfIteration];
+        outputAlfa = new double[numberOfIteration];
+
         for (int t = 0; t < numberOfIteration; t++) {
+
+            System.out.println("\nEpoka " + t);
 
             double[] errors = new double[weakClassifiers.size()];
             double[] eta = new double[weakClassifiers.size()];
-            outputClassifiers = new WeakClassifier[numberOfIteration];
-            outputAlfa = new double[numberOfIteration];
 
             for (int j = 0; j < weakClassifiers.size(); j++) {
                 WeakClassifier weakClassifier = weakClassifiers.get(j);
                 for (int i = 0; i < m; i++) {
-                    errors[j] += D[i] * indicatorFunction(weakClassifier.value(x[i]), y[i]);
+                    errors[j] += D[i] * indicatorFunction(weakClassifier.value(dataSamples.get(i).getIntegralImage()), dataSamples.get(i).getY());
                 }
                 eta[j] = Math.abs(0.5 - errors[j]);
             }
@@ -65,7 +68,7 @@ public class StrongClassifier {
             outputClassifiers[t] = weakClassifier;
 
             for (int i = 0; i < m; i++) {
-                D[i] = D[i] * Math.exp(outputAlfa[t] * (2 * indicatorFunction(y[i], weakClassifier.value(x[i])) - 1));
+                D[i] = D[i] * Math.exp(outputAlfa[t] * (2 * indicatorFunction(dataSamples.get(i).getY(), weakClassifier.value(dataSamples.get(i).getIntegralImage())) - 1));
             }
             double den = 0;
             for (double d : D) {

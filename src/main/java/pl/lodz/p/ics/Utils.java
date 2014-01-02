@@ -4,8 +4,12 @@ import pl.lodz.p.ics.model.*;
 import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.classification.Feature;
 import pl.lodz.p.ics.model.classification.Field;
+import pl.lodz.p.ics.model.classification.IntegralImage;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -124,4 +128,66 @@ public class Utils {
 
     }
 
+    public static List<DataSample> loadDataSet(File directory, double value) throws IOException {
+
+        List<DataSample> dataSamples = new ArrayList<>();
+
+        for (final File file : directory.listFiles()) {
+
+            BufferedImage image = ImageIO.read(file);
+            IntegralImage inegralImage = new IntegralImage(image, 255.0);
+
+            dataSamples.add(new DataSample(inegralImage, value));
+
+//            if (file.isFile()) {
+//                System.out.println(file.getName() + " " + image.getWidth() + " " + image.getHeight());
+//            }
+
+        }
+
+        return dataSamples;
+    }
+
+    public static List<Feature> loadFeatures(List<String> fileNames) {
+
+        List<Feature> features = new ArrayList<>();
+
+        try {
+
+            JAXBContext context = JAXBContext.newInstance(Feature.class);
+
+            for (String name : fileNames) {
+                Unmarshaller um = context.createUnmarshaller();
+                features.add((Feature) um.unmarshal(new File(name)));
+            }
+
+        } catch (JAXBException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return features;
+    }
+
+    public static List<Feature> loadFeatures(File directory) {
+
+        List<Feature> features = new ArrayList<>();
+
+        for (final File file : directory.listFiles()) {
+
+            try {
+
+                JAXBContext context = JAXBContext.newInstance(Feature.class);
+
+                Unmarshaller um = context.createUnmarshaller();
+                features.add((Feature) um.unmarshal(file));
+
+            } catch (JAXBException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+
+
+        return features;
+    }
 }
