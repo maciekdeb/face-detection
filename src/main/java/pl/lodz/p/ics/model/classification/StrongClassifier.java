@@ -3,6 +3,7 @@ package pl.lodz.p.ics.model.classification;
 import pl.lodz.p.ics.model.DataSample;
 import pl.lodz.p.ics.model.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +12,11 @@ import java.util.List;
  * Date: 21.12.13
  * Time: 17:48
  */
-public class StrongClassifier {
+public class StrongClassifier implements Serializable {
 
-    private List<WeakClassifier> candidateWeakClassifiers;
+    private transient List<WeakClassifier> candidateWeakClassifiers;
 
-    private List<DataSample> dataSamples;
+    private transient List<DataSample> dataSamples;
 
     /**
      * weights
@@ -59,13 +60,11 @@ public class StrongClassifier {
         initializeWeights(w);
 
         for (int t = 1; t <= numberOfIteration; t++) {
-            System.out.println("\nEpoka " + t);
+            System.out.println("\nWybór klasyfikatora słabego " + t);
 
             normalizeWeights(w);
 
             // 2. SELECT WEAK CLASSIFIER
-
-            // 3. DEFINE h_t(x)
 
             double[] errors = new double[candidateWeakClassifiers.size()];
             double[] eta = new double[candidateWeakClassifiers.size()];
@@ -79,13 +78,14 @@ public class StrongClassifier {
                 eta[j] = Math.abs(0.5 - errors[j]);
             }
 
+            // 3. DEFINE h_t(x)
+
             int classifierNumber = findMaxIndex(eta);
             WeakClassifier weakClassifier = candidateWeakClassifiers.get(classifierNumber);
 
             alfaFactor[t - 1] = Math.log((1 - errors[classifierNumber]) / errors[classifierNumber]);
             weakClassifiers[t - 1] = weakClassifier;
 
-            // 4. UPDATE THE WEIGHTS
             updateWeights(w, errors[classifierNumber], weakClassifier);
 
         }
@@ -173,4 +173,5 @@ public class StrongClassifier {
     public void setAlfaFactor(double[] alfaFactor) {
         this.alfaFactor = alfaFactor;
     }
+
 }

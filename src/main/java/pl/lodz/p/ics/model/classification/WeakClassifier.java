@@ -2,12 +2,14 @@ package pl.lodz.p.ics.model.classification;
 
 import pl.lodz.p.ics.model.Point;
 
+import java.io.Serializable;
+
 /**
  * User: maciek
  * Date: 21.12.13
  * Time: 17:49
  */
-public class WeakClassifier {
+public class WeakClassifier implements Serializable{
 
     private Feature feature;
     private double threshold;

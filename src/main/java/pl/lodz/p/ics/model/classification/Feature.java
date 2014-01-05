@@ -3,6 +3,7 @@ package pl.lodz.p.ics.model.classification;
 import pl.lodz.p.ics.model.Point;
 
 import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Feature {
+public class Feature implements Serializable{
 
     @XmlElementWrapper(name = "fields")
     @XmlElement(name = "field")

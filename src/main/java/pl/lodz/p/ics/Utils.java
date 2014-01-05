@@ -5,6 +5,7 @@ import pl.lodz.p.ics.model.Point;
 import pl.lodz.p.ics.model.classification.Feature;
 import pl.lodz.p.ics.model.classification.Field;
 import pl.lodz.p.ics.model.classification.IntegralImage;
+import pl.lodz.p.ics.model.classification.StrongClassifier;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBContext;
@@ -12,12 +13,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 import static java.lang.Math.abs;
@@ -189,5 +187,39 @@ public class Utils {
 
 
         return features;
+    }
+
+    public static void saveClassifier(StrongClassifier strongClassifier, String fileName) {
+        FileOutputStream fileOut = null;
+        try {
+            fileOut = new FileOutputStream(fileName + new Date().getTime());
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(strongClassifier);
+            out.close();
+            fileOut.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public static StrongClassifier loadClassifier(String fileName) {
+        FileInputStream fileIn = null;
+        StrongClassifier strongClassifier = null;
+        try {
+            fileIn = new FileInputStream(fileName);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            strongClassifier = (StrongClassifier) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return strongClassifier;
     }
 }

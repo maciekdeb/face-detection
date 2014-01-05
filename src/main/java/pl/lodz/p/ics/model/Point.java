@@ -1,11 +1,13 @@
 package pl.lodz.p.ics.model;
 
+import java.io.Serializable;
+
 /**
  * User: maciek
  * Date: 15.10.13
  * Time: 13:14
  */
-public class Point implements Comparable {
+public class Point implements Comparable, Serializable {
 
     int x;
     int y;
