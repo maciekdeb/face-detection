@@ -20,50 +20,47 @@ public class ClassifierTest {
     @Test
     public void testPasses() throws IOException {
 
-        List<DataSample> dataSamplesFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/face/"), 1.0);
-        List<DataSample> dataTestFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/test/face/"), 1.0);
+//        List<DataSample> dataSamplesFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/face/"), 1.0, 700, true);
+        List<DataSample> dataTestFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/test/face/"), 1.0, true);
 
-        List<DataSample> dataSamplesNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/non-face/"), 0.0);
-        List<DataSample> dataTestNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/test/non-face/"), 0.0);
+//        List<DataSample> dataSamplesNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/train/non-face/"), 0.0, 1400, true);
+        List<DataSample> dataTestNonFaces = Utils.loadDataSet(new File("/home/maciek/baza-test/test/non-face/"), 0.0, true);
 
-        System.out.println("Zbiór treningowy\nIlość próbek z twarzą: " + dataSamplesFaces.size() + "\nIlość próbek bez twarzy: " + dataSamplesNonFaces.size());
-        System.out.println("Zbiór testowy\nIlość próbek z twarzą: " + dataTestFaces.size() + "\nIlość próbek bez twarzy: " + dataTestNonFaces.size());
-
-
-        List<Feature> features1 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature1/xml/"));
-        List<Feature> features2 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature2/xml/"));
-        List<Feature> features3 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature3/xml/"));
-        List<Feature> features4 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature4/xml/"));
-        List<Feature> features5 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature5/xml/"));
-        List<Feature> features6 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature6/xml/"));
-        List<Feature> features7 = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature7/xml/"));
-        List<Feature> features = new ArrayList<>();
-        features.addAll(features1);
-        features.addAll(features2);
-        features.addAll(features3);
-        features.addAll(features4);
-        features.addAll(features5);
-        features.addAll(features6);
-        features.addAll(features7);
-        System.out.println("\nLiczba cech:\n1-rodzaju: " + features1.size() + "\n2-rodzaju: " + features2.size() + "\n3-rodzaju: " + features3.size() + "\n4-rodzaju: " + features4.size() + "\n5-rodzaju: " + features5.size() + "\n6-rodzaju: " + features6.size() + "\n7-rodzaju: " + features7.size());
+//        System.out.println("Zbiór treningowy\nIlość próbek z twarzą: " + dataSamplesFaces.size() + "\nIlość próbek bez twarzy: " + dataSamplesNonFaces.size());
+//        System.out.println("Zbiór testowy\nIlość próbek z twarzą: " + dataTestFaces.size() + "\nIlość próbek bez twarzy: " + dataTestNonFaces.size());
 
 
+//        int[] haarLikeFeatureNumbers = new int[]{1, 2, 3, 4, 5, 6, 7};
+//        List<Feature> features = new ArrayList<Feature>();
+//        System.out.println("\nLiczba cech:");
+//        for (int number : haarLikeFeatureNumbers) {
+//            List<Feature> featuresElement = Utils.loadFeatures(new File("/home/maciek/Dropbox/workspaces/java/face-detection/features/feature" + number + "/xml/"));
+//            features.addAll(featuresElement);
+//            System.out.println(number + "-rodzaju: " + featuresElement.size());
+//        }
 
-        StrongClassifier strongClassifier = /*Utils.loadClassifier("strongClassifier-100-1388787495674");*/new StrongClassifier(features, dataSamplesFaces, dataSamplesNonFaces);
-        strongClassifier.learn(230);
 
-        System.out.print("\nWartosci wspolczynnikow klasyfikatora silnego: ");
-        for (double d : strongClassifier.getAlfaFactor()) {
-            System.out.print(d + " ");
-        }
-        System.out.println("\nKlasyfikatory slabe: " + Arrays.toString(strongClassifier.getWeakClassifiers()));
+        StrongClassifier strongClassifier = Utils.loadClassifier("strongClassifier-100-1389215372691");/*new StrongClassifier(features, dataSamplesFaces, dataSamplesNonFaces);*/
+        int WEAK_CLASS_NUMBER = 100;
+//        strongClassifier.learn(WEAK_CLASS_NUMBER);
+//
+//        System.out.print("\nWartosci wspolczynnikow klasyfikatora silnego: ");
+//        for (double d : strongClassifier.getAlfaFactor()) {
+//            System.out.print(d + " ");
+//        }
+//        System.out.println("\nKlasyfikatory slabe: " + Arrays.toString(strongClassifier.getWeakClassifiers()));
 
-        List<DataSample> dataTest = new ArrayList<>();
+        List<DataSample> dataTest = new ArrayList<DataSample>();
         dataTest.addAll(dataTestFaces);
         dataTest.addAll(dataTestNonFaces);
         double ratio = 0;
         int testSize = 900;
         boolean used[] = new boolean[testSize];
+
+        double falsePositive = 0;
+        double truePositive = 0;
+        double falseNegative = 0;
+        double trueNegative = 0;
 
         for (int i = 1; i < testSize; i++) {
 
@@ -76,14 +73,33 @@ public class ClassifierTest {
             double faceDetect = strongClassifier.detect(ds.getIntegralImage(), new Point(0, 0));
 
             if (faceDetect == ds.getY()) {
+                if (faceDetect == 1.0) {
+                    truePositive++;
+                } else {
+                    trueNegative++;
+                }
                 ratio++;
+            } else {
+                if (faceDetect == 1.0) {
+                    falsePositive++;
+                } else {
+                    falseNegative++;
+                }
             }
+
             System.out.print("\nPróbka nr: " + i + "\tWartość oczekiwana: " + ds.getY() + " wart. otrzymana: " + faceDetect);
 
-            System.out.println("\n\tWspolczynnik poprawnych: " + ratio / i);
+            System.out.println("\n\tWspolczynnik poprawnych: " + ratio / i + "\ntruePositive: " + truePositive / i + "\ttrueNegative" + trueNegative / i + "\tfalsePositive: " + falsePositive / i + "\tfalseNegative: " + falseNegative / i);
         }
 
-        Utils.saveClassifier(strongClassifier, "strongClassifier-230-");
+
+        Utils.saveClassifier(strongClassifier, "strongClassifier-" + WEAK_CLASS_NUMBER + "-");
+        WeakClassifier[] weakClassifiers = strongClassifier.getWeakClassifiers();
+        List<Feature> features1 = new ArrayList<Feature>();
+        for (int i = 0; i < WEAK_CLASS_NUMBER; i++) {
+            features1.add(weakClassifiers[i].getFeature());
+        }
+        Utils.drawFeature(features1,"feat-5-", 10);
     }
 
 

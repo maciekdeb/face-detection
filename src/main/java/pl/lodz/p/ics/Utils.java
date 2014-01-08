@@ -126,21 +126,38 @@ public class Utils {
 
     }
 
-    public static List<DataSample> loadDataSet(File directory, double value) throws IOException {
+    public static List<DataSample> loadDataSet(File directory, double classificationResponse, int numberOfFiles, boolean normalize) throws IOException {
 
-        List<DataSample> dataSamples = new ArrayList<>();
+        List<DataSample> dataSamples = new ArrayList<DataSample>();
 
+        int i = 0;
         for (final File file : directory.listFiles()) {
-
+            if (i++ == numberOfFiles) {
+                break;
+            }
             BufferedImage image = ImageIO.read(file);
-            IntegralImage inegralImage = new IntegralImage(image, 255.0);
+            if (normalize) {
+                image = HistogramUtils.equalizeHistogram(image);
+            }
+            IntegralImage integralImage = new IntegralImage(image, 255.0);
+            dataSamples.add(new DataSample(integralImage, classificationResponse));
+        }
 
-            dataSamples.add(new DataSample(inegralImage, value));
+        return dataSamples;
+    }
 
-//            if (file.isFile()) {
-//                System.out.println(file.getName() + " " + image.getWidth() + " " + image.getHeight());
-//            }
+    public static List<DataSample> loadDataSet(File directory, double classificationResponse, boolean normalize) throws IOException {
 
+        List<DataSample> dataSamples = new ArrayList<DataSample>();
+
+        int i = 0;
+        for (final File file : directory.listFiles()) {
+            BufferedImage image = ImageIO.read(file);
+            if (normalize) {
+                image = HistogramUtils.equalizeHistogram(image);
+            }
+            IntegralImage integralImage = new IntegralImage(image, 255.0);
+            dataSamples.add(new DataSample(integralImage, classificationResponse));
         }
 
         return dataSamples;
@@ -148,7 +165,7 @@ public class Utils {
 
     public static List<Feature> loadFeatures(List<String> fileNames) {
 
-        List<Feature> features = new ArrayList<>();
+        List<Feature> features = new ArrayList<Feature>();
 
         try {
 
@@ -168,7 +185,7 @@ public class Utils {
 
     public static List<Feature> loadFeatures(File directory) {
 
-        List<Feature> features = new ArrayList<>();
+        List<Feature> features = new ArrayList<Feature>();
 
         for (final File file : directory.listFiles()) {
 

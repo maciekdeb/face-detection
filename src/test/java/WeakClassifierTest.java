@@ -48,7 +48,7 @@ public class WeakClassifierTest {
         System.out.println("\n\n\n");
 
         WeakClassifier weakClassifier = new WeakClassifier();
-        List<Field> fields = new ArrayList<>();
+        List<Field> fields = new ArrayList<Field>();
         fields.add(new Field(new Point(1, 1), new Point(3, 3), -1));
         fields.add(new Field(new Point(4, 1), new Point(6, 3), 1));
         fields.add(new Field(new Point(1, 4), new Point(3, 6), 1));

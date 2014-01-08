@@ -13,6 +13,7 @@ public class WeakClassifier implements Serializable{
 
     private Feature feature;
     private double threshold;
+    private double polarity;
 
     public WeakClassifier() {}
 
@@ -30,10 +31,7 @@ public class WeakClassifier implements Serializable{
     }
 
     public double activateFunction(double x) {
-        if (x < threshold) {
-            return 1;
-        }
-        return 0;
+        return (polarity * x < polarity * threshold ? 1 : 0);
     }
 
     public Feature getFeature() {
@@ -44,4 +42,19 @@ public class WeakClassifier implements Serializable{
         this.feature = feature;
     }
 
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    public double getPolarity() {
+        return polarity;
+    }
+
+    public void setPolarity(double polarity) {
+        this.polarity = polarity;
+    }
 }
