@@ -23,7 +23,9 @@ public class IntegralImage {
         //  skopiuj wartosci pikseli do obrazu scalkowanego
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                integralImage[y][x] = /*((*/bufferedImage.getRGB(x, y)/* >> 8) & 0xFF)*/ / denominator;
+                int color = bufferedImage.getRGB(x, y);
+                integralImage[y][x] = ((color >> 8) & 0xFF) + ((color >> 16) & 0xFF) + ((color >> 24) & 0xFF);
+                integralImage[y][x] /= denominator;
             }
         }
 

@@ -107,24 +107,26 @@ public class StrongClassifier implements Serializable {
             // 2. SELECT WEAK CLASSIFIER b) select weak classifier
 
             double[] errors = new double[candidateWeakClassifiers.size()];
-            double[] eta = new double[candidateWeakClassifiers.size()];
+//            double[] eta = new double[candidateWeakClassifiers.size()];
 
             for (int j = 0; j < candidateWeakClassifiers.size(); j++) {
                 WeakClassifier weakClassifier = candidateWeakClassifiers.get(j);
                 for (int i = 0; i < n; i++) {
                     DataSample ds = examples[i].getDs();
-                    errors[j] += examples[i].getW() * indicatorFunction(weakClassifier.value(ds.getIntegralImage()), ds.getY());
+//                    errors[j] += examples[i].getW() * indicatorFunction(weakClassifier.value(ds.getIntegralImage()), ds.getY());
+                    errors[j] += examples[i].getW() * Math.abs(weakClassifier.value(ds.getIntegralImage()) - ds.getY());
                 }
-                eta[j] = Math.abs(0.5 - errors[j]);
+//                eta[j] = Math.abs(0.5 - errors[j]);
             }
 
             // 3. DEFINE h_t(x)
 
-            int classifierNumber = findMaxIndex(eta);
+//            int classifierNumber = findMaxIndex(eta);
+            int classifierNumber = findMinIndex(errors);
             WeakClassifier weakClassifier = candidateWeakClassifiers.get(classifierNumber);
-            System.out.println("\tthreshold " + weakClassifier.getThreshold() + " polarity " + weakClassifier.getPolarity());
 
             double error = errors[classifierNumber];
+            System.out.println("\tthreshold " + weakClassifier.getThreshold() + " polarity " + weakClassifier.getPolarity() + " e=" + error);
             alfaFactor[t - 1] = Math.log((1.0 - error) / error);
             weakClassifiers[t - 1] = weakClassifier;
 
@@ -135,14 +137,14 @@ public class StrongClassifier implements Serializable {
 
     public double[] findThreshold(double[] e) {
 
-        int index = 0;
-        double eMin = e[index];
+        int index = findMinIndex(e);
+        /*double eMin = e[index];
         for (int i = 1; i < e.length; i++) {
             if (eMin > e[i]) {
                 eMin = e[i];
                 index = i;
             }
-        }
+        }*/
 
         double threshold, polarity;
         Example a, b;
@@ -181,22 +183,6 @@ public class StrongClassifier implements Serializable {
         }
         return (x == 0.0) ? 0.0 : (x > 0.0) ? 1.0 : -1.0;
     }
-
-    /*public void sortExamplesByFeatureValue() {
-
-        int length = examples.length;
-        Example tmpExample;
-
-        for (int i = 0; i < length; i++) {
-            for (int j = (length - 1); j >= (i + 1); j--) {
-                if (examples[j].getActualResponse() < examples[j - 1].getActualResponse()) {
-                    tmpExample = examples[j];
-                    examples[j] = examples[j - 1];
-                    examples[j - 1] = tmpExample;
-                }
-            }
-        }
-    }*/
 
     public double sumWeightBelow(int belowIndex, int response) {
         double sum = 0;
@@ -262,7 +248,6 @@ public class StrongClassifier implements Serializable {
     public int findMaxIndex(double[] array) {
         double maxValue = array[0];
         int maxIndex = 0;
-
         for (int i = 0; i < array.length; i++) {
             double value = array[i];
             if (value > maxValue) {
@@ -270,8 +255,20 @@ public class StrongClassifier implements Serializable {
                 maxIndex = i;
             }
         }
-
         return maxIndex;
+    }
+
+    public int findMinIndex(double[] array) {
+        int minIndex = 0;
+        double minValue = array[minIndex];
+        for (int i = 1; i < array.length; i++) {
+            double value = array[i];
+            if (value < minValue) {
+                minValue = value;
+                minIndex = i;
+            }
+        }
+        return minIndex;
     }
 
     public double indicatorFunction(double a, double b) {
