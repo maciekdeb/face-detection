@@ -15,39 +15,62 @@ public class IntegralImage {
 
     public IntegralImage(BufferedImage bufferedImage, double denominator) {
 
-        this.integralImage = new double[bufferedImage.getHeight()][bufferedImage.getWidth()];
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
 
-        for (int x = 0; x < bufferedImage.getWidth(); x++) {
-            for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                for (int i = 0; i <= x; i++) {
-                    for (int j = 0; j <= y; j++) {
-                        //TODO
-                        integralImage[y][x] += ((bufferedImage.getRGB(i, j) >> 8) & 0xFF) / denominator;
+        this.integralImage = new double[height][width];
 
-                    }
-                }
+        //  skopiuj wartosci pikseli do obrazu scalkowanego
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                integralImage[y][x] = /*((*/bufferedImage.getRGB(x, y)/* >> 8) & 0xFF)*/ / denominator;
             }
         }
+
+        //  oblicz krawedz gorna
+        for (int x = 1; x < width; x++) {
+            integralImage[0][x] += integralImage[0][x - 1];
+        }
+        //  oblicz krawedz lewa
+        for (int y = 1; y < height; y++) {
+            integralImage[y][0] += integralImage[y - 1][0];
+        }
+
+        //  oblicz srodek
+        for (int x = 1; x < width; x++) {
+            for (int y = 1; y < height; y++) {
+                integralImage[y][x] += (integralImage[y][x - 1] + integralImage[y - 1][x]) - integralImage[y - 1][x - 1];
+            }
+        }
+
     }
 
     public double getRectangleValue(Point topLeft, Point bottomRight) {
 
-        if (topLeft.getX() > bottomRight.getX() || topLeft.getY() > bottomRight.getY()) {
-            throw new IllegalArgumentException("Rectangle not valid");
+        int bX = bottomRight.getX();
+        int bY = bottomRight.getY();
+
+        int tX = topLeft.getX();
+        int tY = topLeft.getY();
+
+        double result = integralImage[bY][bX];
+
+        boolean isTopSpace = topLeft.getY() > 0;
+        boolean isLeftSpace = topLeft.getX() > 0;
+
+        tX--;
+        tY--;
+
+        if (isLeftSpace) {
+            result -= integralImage[bY][tX];
         }
 
-        double result = integralImage[bottomRight.getY()][bottomRight.getX()];
-
-        if (topLeft.getX() > 0) {
-            result -= integralImage[bottomRight.getY()][topLeft.getX() - 1];
+        if (isTopSpace) {
+            result -= integralImage[tY][bX];
         }
 
-        if (topLeft.getY() > 0) {
-            result -= integralImage[topLeft.getY() - 1][bottomRight.getX()];
-        }
-
-        if (topLeft.getX() > 0 && topLeft.getY() > 0) {
-            result += integralImage[topLeft.getY() - 1][topLeft.getX() - 1];
+        if (isLeftSpace && isTopSpace) {
+            result += integralImage[tY][tX];
         }
 
         return result;

@@ -31,7 +31,11 @@ public class StrongClassifier implements Serializable {
     private WeakClassifier[] weakClassifiers;
     private double[] alfaFactor;
 
-    public StrongClassifier(List<Feature> features, List<DataSample> positiveSamples, List<DataSample> negativeSamples) {
+    public static final int USE_CONSTANT_THRESHOLD = 0;
+    public static final int FIND_THRESHOLD = 1;
+    public int thresholdOption = USE_CONSTANT_THRESHOLD;
+
+    public StrongClassifier(List<Feature> features, List<DataSample> positiveSamples, List<DataSample> negativeSamples, int thresholdOption) {
 
         this.n = positiveSamples.size() + negativeSamples.size();
 
@@ -44,6 +48,7 @@ public class StrongClassifier implements Serializable {
         }
 
         this.candidateFeatures = features;
+        this.thresholdOption = thresholdOption;
     }
 
     public void learn(int numberOfIteration) {
@@ -59,44 +64,44 @@ public class StrongClassifier implements Serializable {
             normalizeWeights();
 
             // 2. SELECT WEAK CLASSIFIER a) find optimal threshold
+            if (thresholdOption == FIND_THRESHOLD) {
 
-            double totalPositive = sumWeightBelow(n, 1);
-            double totalNegative = sumWeightBelow(n, 0);
+                double totalPositive = sumWeightBelow(n, 1);
+                double totalNegative = sumWeightBelow(n, 0);
 
-            for (int i = 0; i < candidateFeatures.size(); i++) {
+                for (int i = 0; i < candidateFeatures.size(); i++) {
 
-                for (int j = 0; j < n; j++) {
-                    examples[j].setActualResponse(candidateFeatures.get(i).value(examples[j].getDs().getIntegralImage(), new Point(0, 0)));
+                    for (int j = 0; j < n; j++) {
+                        examples[j].setActualResponse(candidateFeatures.get(i).value(examples[j].getDs().getIntegralImage(), new Point(0, 0)));
+                    }
+
+                    Arrays.sort(examples);
+
+                    double[] belowPositive = new double[n];
+                    double[] belowNegative = new double[n];
+                    for (int j = 0; j < n; j++) {
+                        belowPositive[j] = sumWeightBelow(j, 1);
+                        belowNegative[j] = sumWeightBelow(j, 0);
+                    }
+
+                    double[] e = new double[n];
+                    for (int j = 0; j < n; j++) {
+                        double left = belowPositive[j] + totalNegative - belowNegative[j];
+                        double right = belowNegative[j] + totalPositive - belowPositive[j];
+                        e[j] = Math.min(left, right);
+                    }
+
+                    double[] thresh =/* new double[]{sign(e[index]), e[index]}; */findThreshold(e);
+                    double polarity = thresh[0];
+                    double threshold = thresh[1];
+
+                    WeakClassifier newCandidate = new WeakClassifier(candidateFeatures.get(i), threshold);
+                    newCandidate.setPolarity(polarity);
+
+                    if (threshold != 0) {
+                        candidateWeakClassifiers.add(newCandidate);
+                    }
                 }
-
-//                sortExamplesByFeatureValue();
-                Arrays.sort(examples);
-
-                double[] belowPositive = new double[n];
-                double[] belowNegative = new double[n];
-                for (int j = 0; j < n; j++) {
-                    belowPositive[j] = sumWeightBelow(j, 1);
-                    belowNegative[j] = sumWeightBelow(j, 0);
-                }
-
-                double[] e = new double[n];
-                for (int j = 0; j < n; j++) {
-                    double left = belowPositive[j] + totalNegative - belowNegative[j];
-                    double right = belowNegative[j] + totalPositive - belowPositive[j];
-                    e[j] = Math.min(left, right);
-                }
-
-                double[] thresh =/* new double[]{sign(e[index]), e[index]}; */findThreshold(e);
-                double polarity = thresh[0];
-                double threshold = thresh[1];
-
-                WeakClassifier newCandidate = new WeakClassifier(candidateFeatures.get(i), threshold);
-                newCandidate.setPolarity(polarity);
-
-                if (threshold != 0) {
-                    candidateWeakClassifiers.add(newCandidate);
-                }
-
             }
 
             // 2. SELECT WEAK CLASSIFIER b) select weak classifier
@@ -119,10 +124,11 @@ public class StrongClassifier implements Serializable {
             WeakClassifier weakClassifier = candidateWeakClassifiers.get(classifierNumber);
             System.out.println("\tthreshold " + weakClassifier.getThreshold() + " polarity " + weakClassifier.getPolarity());
 
-            alfaFactor[t - 1] = Math.log((1 - errors[classifierNumber]) / errors[classifierNumber]);
+            double error = errors[classifierNumber];
+            alfaFactor[t - 1] = Math.log((1.0 - error) / error);
             weakClassifiers[t - 1] = weakClassifier;
 
-            updateWeights(errors[classifierNumber], weakClassifier);
+            updateWeights(error, weakClassifier);
 
         }
     }

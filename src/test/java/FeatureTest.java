@@ -18,16 +18,18 @@ public class FeatureTest {
 
         FeatureGenerator featureGenerator = new FeatureGenerator();
 
-        String whichFeature = "feature1";
+        int[] which = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
 
-        List<Feature> featureList = Utils.loadFeatures(Collections.singletonList("features/" + whichFeature + "/" + whichFeature + "-scheme.xml"));
+        for (int i : which) {
+            List<Feature> featureList = Utils.loadFeatures(Collections.singletonList("features/feature" + i + "/feature" + i + "-scheme.xml"));
 
-        List<Feature> generatedFeatures = featureGenerator.generateResizedFeatures(featureList, 24, 24, 1, 1);
-        generatedFeatures = featureGenerator.generateMovedFeatures(generatedFeatures, 24, 24, 2, 2);
+            List<Feature> generatedFeatures = featureGenerator.generateResizedFeatures(featureList, 24, 24, 1, 1);
+            generatedFeatures = featureGenerator.generateMovedFeatures(generatedFeatures, 24, 24, 1, 1);
 
-        featureGenerator.saveFeature(generatedFeatures, "features/" + whichFeature + "/xml/" + whichFeature);
+            featureGenerator.saveFeature(generatedFeatures, "features/feature" + i + "/xml/feature" + i);
 
-        Utils.drawFeature(generatedFeatures, "features/" + whichFeature + "/images/" + whichFeature, 10);
+            Utils.drawFeature(generatedFeatures, "features/feature" + i + "/images/feature" + i, 10);
+        }
 
     }
 
