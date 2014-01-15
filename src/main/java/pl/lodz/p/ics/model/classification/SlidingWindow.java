@@ -11,9 +11,9 @@ public class SlidingWindow {
     private int y;
 
     private int scalingSteps;
-    private int scale;
+    private double scale;
 
-    public SlidingWindow(int x, int y, int scalingSteps, int scale) {
+    public SlidingWindow(int x, int y, int scalingSteps, double scale) {
         this.x = x;
         this.y = y;
         this.scalingSteps = scalingSteps;
@@ -44,11 +44,11 @@ public class SlidingWindow {
         this.scalingSteps = scalingSteps;
     }
 
-    public int getScale() {
+    public double getScale() {
         return scale;
     }
 
-    public void setScale(int scale) {
+    public void setScale(double scale) {
         this.scale = scale;
     }
 }

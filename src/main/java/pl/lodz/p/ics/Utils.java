@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -239,4 +240,13 @@ public class Utils {
         }
         return strongClassifier;
     }
+
+    public static BufferedImage drawRectangle(Point a, Point b, BufferedImage bufferedImage) {
+        Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
+        g.setColor(Color.GREEN);
+        g.draw(new Rectangle2D.Double(a.getX(), a.getY(), (b.getX() - a.getX()) + 1, (b.getY() - a.getY()) + 1));
+
+        return bufferedImage;
+    }
+
 }
