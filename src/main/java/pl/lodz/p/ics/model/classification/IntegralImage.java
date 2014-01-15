@@ -25,7 +25,7 @@ public class IntegralImage {
             for (int y = 0; y < height; y++) {
                 int color = bufferedImage.getRGB(x, y);
                 integralImage[y][x] = ((color >> 8) & 0xFF) + ((color >> 16) & 0xFF) + ((color >> 24) & 0xFF);
-                integralImage[y][x] /= denominator;
+                integralImage[y][x] /= (3.0 * denominator);
             }
         }
 

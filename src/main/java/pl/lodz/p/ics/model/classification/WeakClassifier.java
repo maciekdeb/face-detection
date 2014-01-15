@@ -17,6 +17,12 @@ public class WeakClassifier implements Serializable{
 
     public WeakClassifier() {}
 
+    public WeakClassifier(Feature feature, double threshold, double polarity) {
+        this.feature = feature;
+        this.threshold = threshold;
+        this.polarity = polarity;
+    }
+
     public WeakClassifier(Feature feature, double threshold) {
         this.feature = feature;
         this.threshold = threshold;

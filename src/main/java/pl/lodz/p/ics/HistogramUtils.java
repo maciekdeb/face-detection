@@ -9,6 +9,43 @@ import java.awt.image.BufferedImage;
  */
 public class HistogramUtils {
 
+    public static BufferedImage stretchHistogram(BufferedImage image) {
+        int[] histogram = createHistogram(image);
+        double min = findMinimumIntensity(histogram);
+        double max = findMaximumIntensity(histogram);
+
+        System.out.println(min + " " + max );
+        for (int a = 0; a < image.getWidth(); a++) {
+            for (int b = 0; b < image.getHeight(); b++) {
+                int color = image.getRGB(a, b);
+                color = ((color >> 8) & 0xFF) + ((color >> 16) & 0xFF) + ((color >> 24) & 0xFF);
+                color /= 3;
+                color = (int) (((color - min) * 255.0 / (max - min)));
+                color |= (color << 8);
+                color |= (color << 16);
+                image.setRGB(a, b, color);
+            }
+        }
+
+        return image;
+    }
+
+    public static int findMinimumIntensity(int[] histogram) {
+        int left = 0;
+        while (histogram[left] == 0) {
+            left++;
+        }
+        return left;
+    }
+
+    public static int findMaximumIntensity(int[] histogram) {
+        int right = histogram.length - 1;
+        while (histogram[right] == 0) {
+            right--;
+        }
+        return right;
+    }
+
     public static BufferedImage equalizeHistogram(BufferedImage image) {
         int[] histogram = createHistogram(image);
         double[][] cdf = calculateCDF(calculatePMF(histogram));

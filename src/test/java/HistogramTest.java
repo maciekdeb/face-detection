@@ -21,26 +21,11 @@ public class HistogramTest {
     @Test
     public void testPasses() throws IOException {
 
-        BufferedImage image = ImageIO.read(new File("/home/maciek/face00016.png"));
+        BufferedImage image = ImageIO.read(new File("/home/maciek/FACE/histogram/audrey2.jpg"));
 
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                System.out.print("\t" + (image.getRGB(i, j) >> 8 & 0xFF));
-            }
-            System.out.println("");
-        }
+        image = HistogramUtils.stretchHistogram(image);
 
-        System.out.println("\n\n");
-
-        image = HistogramUtils.equalizeHistogram(image);
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                System.out.print("\t" + (image.getRGB(i, j) >> 8 & 0xFF));
-            }
-            System.out.println("");
-        }
-
-        ImageIO.write(image, "PNG", new File("/home/maciek/face00016new.png"));
+        ImageIO.write(image, "JPG", new File("/home/maciek/FACE/histogram/audrey2_stretched.jpg"));
 
     }
 

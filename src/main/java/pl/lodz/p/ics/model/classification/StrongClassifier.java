@@ -49,6 +49,13 @@ public class StrongClassifier implements Serializable {
 
         this.candidateFeatures = features;
         this.thresholdOption = thresholdOption;
+
+        if (thresholdOption == USE_CONSTANT_THRESHOLD) {
+            candidateWeakClassifiers = new ArrayList<WeakClassifier>();
+            for (Feature f : candidateFeatures) {
+                this.candidateWeakClassifiers.add(new WeakClassifier(f, 0.0, 1.0));
+            }
+        }
     }
 
     public void learn(int numberOfIteration) {
@@ -59,12 +66,11 @@ public class StrongClassifier implements Serializable {
         for (int t = 1; t <= numberOfIteration; t++) {
             System.out.println("\nWybór klasyfikatora słabego " + t);
 
-            candidateWeakClassifiers = new ArrayList<WeakClassifier>();
-
             normalizeWeights();
 
             // 2. SELECT WEAK CLASSIFIER a) find optimal threshold
             if (thresholdOption == FIND_THRESHOLD) {
+                candidateWeakClassifiers = new ArrayList<WeakClassifier>();
 
                 double totalPositive = sumWeightBelow(n, 1);
                 double totalNegative = sumWeightBelow(n, 0);
@@ -138,13 +144,6 @@ public class StrongClassifier implements Serializable {
     public double[] findThreshold(double[] e) {
 
         int index = findMinIndex(e);
-        /*double eMin = e[index];
-        for (int i = 1; i < e.length; i++) {
-            if (eMin > e[i]) {
-                eMin = e[i];
-                index = i;
-            }
-        }*/
 
         double threshold, polarity;
         Example a, b;
@@ -153,28 +152,24 @@ public class StrongClassifier implements Serializable {
             if (examples[index - 1].getDs().getY() != examples[index].getDs().getY()) {
                 a = examples[index - 1];
                 b = examples[index];
-            } else if (examples[index].getDs().getY() != examples[index + 1].getDs().getY()) {
-                a = examples[index];
-                b = examples[index + 1];
-            } else {
-                return new double[]{0.0, 1.0};
+                polarity = (a.getDs().getY() == 0 && b.getDs().getY() == 1 ? -1.0 : 1.0);
+                threshold = a.getActualResponse() - b.getActualResponse();
+                threshold = Math.abs(threshold) / 2.0;
+                threshold += a.getActualResponse();
+                return new double[]{polarity, threshold};
             }
-        } else {
+        } else if (index + 1 < examples.length){
             if (examples[index].getDs().getY() != examples[index + 1].getDs().getY()) {
                 a = examples[index];
                 b = examples[index + 1];
-            } else {
-                return new double[]{0.0, 1.0};
+                polarity = (a.getDs().getY() == 0 && b.getDs().getY() == 1 ? -1.0 : 1.0);
+                threshold = a.getActualResponse() - b.getActualResponse();
+                threshold = Math.abs(threshold) / 2.0;
+                threshold += a.getActualResponse();
+                return new double[]{polarity, threshold};
             }
         }
-
-        polarity = (a.getDs().getY() == 0 && b.getDs().getY() == 1 ? -1.0 : 1.0);
-        threshold = a.getActualResponse() - b.getActualResponse();
-        threshold = Math.abs(threshold) / 2.0;
-        threshold += a.getActualResponse();
-
-        return new double[]{polarity, threshold};
-
+        return new double[]{0.0, 1.0};
     }
 
     public static double sign(final double x) {
